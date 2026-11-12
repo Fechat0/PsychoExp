@@ -6,11 +6,22 @@
 <meta name="theme-color" content="#090f19">
 <title>PX-01｜行为决策实验</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
 :root{color-scheme:dark;--bg:#080d16;--panel:#101a29;--panel2:#142235;--line:#24344a;--muted:#91a2b8;--text:#edf4ff;--green:#26d69a;--red:#ff6578;--blue:#69a9ff;--gold:#f4bd62;--radius:18px;--shadow:0 18px 50px rgba(0,0,0,.28)}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,rgba(40,93,151,.19),transparent 38%),radial-gradient(ellipse at 90% 12%,rgba(19,135,114,.10),transparent 30%),var(--bg);color:var(--text);font:15px/1.6 Inter,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh}
 button,input{font:inherit}button{cursor:pointer}.shell{width:min(1160px,calc(100% - 36px));margin:0 auto;padding:24px 0 58px}.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 0 24px;border-bottom:1px solid rgba(145,162,184,.13);margin-bottom:36px}.brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.04em}.brandmark{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#33d5a5,#4b85ff);display:grid;place-items:center;color:#06131b;font-weight:900;box-shadow:0 8px 24px #24cb9a33}.brand small{display:block;color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.15em}.topmeta{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:12px}.pill{border:1px solid var(--line);padding:5px 10px;border-radius:99px;background:#101a28;color:#a9bad0}.hero{max-width:760px;margin:46px auto 30px;text-align:center}.eyebrow{color:var(--green);font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}.hero h1{font-size:clamp(30px,5vw,48px);line-height:1.16;letter-spacing:-.04em;margin:14px 0}.hero p{color:var(--muted);font-size:16px;max-width:620px;margin:0 auto}.card{background:linear-gradient(145deg,rgba(20,34,53,.97),rgba(14,23,37,.98));border:1px solid rgba(119,150,187,.19);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow)}.narrow{max-width:560px;margin:0 auto}.section-title{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:0 0 18px}.section-title h2{font-size:19px;margin:0;letter-spacing:-.02em}.sub{color:var(--muted);font-size:13px}.field{display:grid;gap:8px;margin:18px 0}.field label{color:#c4d2e3;font-size:13px;font-weight:650}.field input{width:100%;background:#091321;border:1px solid #2a3c54;color:var(--text);padding:14px 15px;border-radius:12px;outline:none}.field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #69a9ff20}.btn{border:0;border-radius:12px;padding:12px 18px;font-weight:800;transition:.18s transform,.18s filter}.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}.btn:disabled{opacity:.42;cursor:not-allowed;transform:none}.primary{background:linear-gradient(100deg,#2bd39d,#68b8ff);color:#07131d}.secondary{background:#1b2b41;color:#dce9fb;border:1px solid #334963}.danger{background:#3a1d2a;color:#ff9eaa;border:1px solid #713446}.ghost{background:transparent;border:1px solid #334963;color:#c4d2e3}.btnrow{display:flex;gap:10px;flex-wrap:wrap}.full{width:100%}.notice{border:1px solid #3c4b60;background:#0c1726;border-radius:12px;padding:13px 15px;color:#aebed2;font-size:13px;margin:16px 0}.notice strong{color:#e6f1ff}.steps{display:flex;align-items:center;gap:8px;margin:0 auto 24px;max-width:760px}.step{height:5px;border-radius:9px;flex:1;background:#243247}.step.active{background:linear-gradient(90deg,#2bd39d,#69a9ff)}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-4{grid-column:span 4}.span-6{grid-column:span 6}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.metric{background:#0b1523;border:1px solid #24374e;border-radius:14px;padding:16px}.metric .label{color:var(--muted);font-size:12px}.metric .value{font-size:23px;font-weight:850;letter-spacing:-.03em;margin-top:4px;font-variant-numeric:tabular-nums}.metric .unit{font-size:11px;color:#8196b0;margin-left:4px}.positive{color:var(--green)!important}.negative{color:var(--red)!important}.neutral{color:var(--blue)!important}.market-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.market-head h1{font-size:28px;margin:4px 0}.quote{display:flex;align-items:baseline;gap:12px;margin-top:6px}.quote strong{font-size:34px;letter-spacing:-.04em;font-variant-numeric:tabular-nums}.chartbox{height:118px;margin-top:14px}.chartline{width:100%;height:100%;overflow:visible}.daystrip{display:flex;gap:6px;margin-top:12px}.daydot{flex:1;text-align:center;padding:7px 3px;border-radius:8px;background:#0c1725;color:#71859e;font-size:10px;border:1px solid #1c2c40}.daydot.done{color:#b9cbe0;border-color:#3b526d}.daydot.active{background:#17332f;border-color:#2a9b78;color:#74edc3}.advisor{border:1px solid #31465f;background:linear-gradient(145deg,#101e30,#101927);border-radius:15px;padding:18px;margin-top:16px}.advisor-top{display:flex;justify-content:space-between;align-items:center;gap:12px}.advisor-title{font-weight:800}.advisor-mark{color:var(--gold);font-size:11px;border:1px solid #6a5435;border-radius:99px;padding:4px 8px}.advice-copy{color:#c0cee0;margin:14px 0 0;white-space:pre-line}.advice-footer{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.tag{padding:5px 9px;border-radius:8px;background:#17283b;color:#a9bdd5;font-size:12px}.tag.buy{color:#6ce6b7;background:#12372f}.tag.sell{color:#ff9aa7;background:#3a202b}.tag.hold{color:#9fc4ff;background:#1b2e49}.trade-controls{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:end;margin-top:16px}.trade-controls input{background:#091321;border:1px solid #2a3c54;color:white;border-radius:11px;padding:12px;min-width:0;width:100%}.quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.divider{height:1px;background:#25364b;margin:18px 0}.status{font-size:13px;color:var(--muted);min-height:22px;margin-top:10px}.bottomrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:20px}.survey-group{margin:22px 0 28px}.survey-group h3{font-size:16px;margin:0 0 4px}.question{padding:15px 0;border-bottom:1px solid #233348}.question:last-child{border:0}.qtext{font-size:14px;color:#d6e1ef;margin-bottom:12px}.likert{display:grid;grid-template-columns:repeat(7,minmax(28px,1fr));gap:7px}.likert label{display:grid;justify-items:center;gap:6px;color:#93a6bd;font-size:11px;cursor:pointer}.likert input{appearance:none;width:22px;height:22px;border:1px solid #52677f;border-radius:50%;margin:0;background:#0a1422}.likert input:checked{border:6px solid #4fe0b1;background:#0a1422;box-shadow:0 0 0 3px #4fe0b122}.scale-note{display:flex;justify-content:space-between;color:#7f93ac;font-size:11px;margin-top:6px}.range-row{display:grid;grid-template-columns:130px 1fr 56px;gap:12px;align-items:center;margin:14px 0}.range-row label{font-size:13px;color:#c6d4e4}.range-row input{width:100%;accent-color:#42d8ad}.range-val{text-align:right;font-variant-numeric:tabular-nums;font-weight:800;color:#e5f2ff}.choice{display:flex;gap:10px;flex-wrap:wrap}.choice label{display:flex;align-items:center;gap:8px;border:1px solid #30445d;border-radius:11px;padding:11px 14px;color:#c7d5e7;cursor:pointer}.choice input{accent-color:#42d8ad}.success-mark{width:64px;height:64px;border-radius:50%;background:#13392f;color:#56e2b5;display:grid;place-items:center;font-size:30px;margin:0 auto 16px}.center{text-align:center}.muted{color:var(--muted)}.error{color:#ff9aa7}.mono{font-variant-numeric:tabular-nums}.loading{opacity:.7;pointer-events:none}
 @media(max-width:760px){.shell{width:min(100% - 24px,600px);padding-top:12px}.topbar{margin-bottom:22px}.topmeta .pill{display:none}.card{padding:19px}.grid{gap:12px}.span-8,.span-4,.span-6{grid-column:span 12}.metrics{grid-template-columns:repeat(2,1fr)}.metric .value{font-size:19px}.trade-controls{grid-template-columns:1fr 1fr}.trade-controls .field{grid-column:span 2;margin:0}.market-head h1{font-size:23px}.quote strong{font-size:29px}.range-row{grid-template-columns:95px 1fr 48px;gap:8px}.bottomrow{align-items:stretch;flex-direction:column-reverse}.bottomrow .btn{width:100%}.likert{gap:3px}.likert label{font-size:10px}.likert input{width:20px;height:20px}}
+
+/* WeChat / enterprise messenger treatment */
+.chat-shell{height:min(800px,calc(100vh - 145px));min-height:570px;display:flex;flex-direction:column;overflow:hidden;background:#eef0f3;color:#1f2329;border:1px solid #dfe4ea;border-radius:18px;box-shadow:0 22px 60px rgba(0,0,0,.24);margin:18px auto 0;max-width:930px}
+.chat-head{height:70px;flex:0 0 70px;background:#f7f8fa;border-bottom:1px solid #e4e7eb;display:grid;grid-template-columns:50px 1fr 65px;align-items:center;padding:0 16px}
+.chat-back{color:#343a42;font-size:27px;line-height:1;font-weight:300;text-align:left}.chat-person{display:flex;align-items:center;justify-content:center;gap:11px;min-width:0}.chat-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:0 0 40px;border:1px solid #dde3e9;background:#fff}.chat-avatar.robot{display:grid;place-items:center;background:linear-gradient(145deg,#dbeafe,#c7d2fe);font-size:23px;border:1px solid #c3d1e5}.chat-avatar.user-avatar{width:34px;height:34px;flex-basis:34px;background:#d1e7dc;display:grid;place-items:center;font-size:15px;color:#24694f;font-weight:800}.chat-name{font-size:15px;font-weight:800;color:#20252d;white-space:nowrap}.chat-subtitle{font-size:11px;color:#8a939f;margin-top:1px}.online-dot{display:inline-block;width:7px;height:7px;background:#27c36a;border-radius:50%;margin-left:6px;vertical-align:2px;box-shadow:0 0 0 3px #27c36a1d}.chat-head-tag{justify-self:end;color:#9aa3ad;font-size:11px}
+.chat-stream{flex:1;min-height:0;overflow-y:auto;padding:19px clamp(12px,3vw,28px) 24px;background:#eef0f3;scroll-behavior:smooth}.chat-day{width:max-content;margin:0 auto 20px;padding:4px 13px;border-radius:5px;background:#dfe3e8;color:#7d8792;font-size:11px;letter-spacing:.04em}.chat-line{display:flex;align-items:flex-end;gap:9px;margin:13px 0;animation:chatIn .2s ease-out}.chat-line.user{justify-content:flex-end}.chat-line.advisor{justify-content:flex-start}.bubble-wrap{max-width:min(76%,620px);display:flex;flex-direction:column;gap:4px}.bubble{position:relative;padding:10px 13px;border-radius:9px;font-size:14px;line-height:1.65;white-space:pre-line;overflow-wrap:anywhere;box-shadow:0 1px 2px #0000000d}.advisor .bubble{background:#fff;border:1px solid #e5e8eb;color:#242a31;border-top-left-radius:3px}.advisor .bubble:before{content:"";position:absolute;left:-6px;top:12px;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:7px solid #fff}.user .bubble{background:#95ec69;border:1px solid #8cdb63;color:#142016;border-top-right-radius:3px}.user .bubble:after{content:"";position:absolute;right:-6px;top:12px;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:7px solid #95ec69}.bubble-meta{font-size:10px;color:#a0a8b1;padding:0 2px}.user .bubble-meta{text-align:right}.chat-system{width:max-content;max-width:90%;margin:16px auto;padding:4px 10px;border-radius:5px;background:#dfe3e8;color:#7d8792;font-size:11px;text-align:center}.chat-system.warning{background:#f9e6e7;color:#b34a56}.chat-system.notice{background:#e1e8f0;color:#66788d}.withdrawn{opacity:.55;text-decoration:line-through}.typing-line{display:flex;align-items:center;gap:9px;margin:12px 0;animation:chatIn .2s ease-out}.typing-bubble{background:#fff;border:1px solid #e5e8eb;color:#89929e;padding:10px 13px;border-radius:9px;border-top-left-radius:3px;font-size:12px;display:flex;align-items:center;gap:8px}.typing-dots{display:inline-flex;gap:3px}.typing-dots i{width:4px;height:4px;border-radius:50%;background:#9aa4af;animation:typingPulse 1s infinite}.typing-dots i:nth-child(2){animation-delay:.15s}.typing-dots i:nth-child(3){animation-delay:.3s}
+.chat-compose{background:#f7f8fa;border-top:1px solid #e2e5e9;padding:10px 14px 13px;flex:0 0 auto}.chat-compose-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;color:#8b949e;font-size:11px}.chat-compose-top strong{color:#687480}.chat-compose-top button{border:1px solid #d5dbe1;background:#fff;border-radius:7px;padding:6px 10px;color:#46515c;font-size:12px;font-weight:700;cursor:pointer}.chat-compose-top button:hover{background:#f0f3f6}.chat-input-row{display:grid;grid-template-columns:1fr 76px;gap:9px;align-items:end}.chat-input-row textarea{width:100%;resize:none;min-height:42px;max-height:110px;border:1px solid #d8dde3;border-radius:9px;background:#fff;color:#242a31;padding:10px 12px;font:14px/1.5 inherit;outline:none}.chat-input-row textarea:focus{border-color:#8ab8ec;box-shadow:0 0 0 3px #8ab8ec25}.chat-send{height:42px;border:0;border-radius:9px;background:#07c160;color:#fff;font-weight:800;cursor:pointer}.chat-send:disabled{opacity:.45;cursor:not-allowed}.chat-limit{font-size:11px;color:#b06a45}.chat-market-line{max-width:930px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;color:#9eafc3;font-size:12px;padding:0 4px}.chat-empty{padding:30px;text-align:center;color:#9aa3ad;font-size:12px}
+@keyframes chatIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}@keyframes typingPulse{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+@media(max-width:640px){.chat-shell{height:calc(100dvh - 190px);min-height:500px;border-radius:13px;margin-top:12px}.chat-head{height:62px;flex-basis:62px;padding:0 11px;grid-template-columns:30px 1fr 48px}.chat-avatar{width:36px;height:36px;flex-basis:36px}.chat-back{font-size:24px}.chat-person{justify-content:flex-start}.bubble-wrap{max-width:82%}.chat-stream{padding:14px 11px}.chat-compose{padding:8px 9px 10px}.chat-input-row{grid-template-columns:1fr 64px}.chat-market-line{font-size:11px}.chat-compose-top button{padding:6px 8px}}
+
 </style>
 </head>
 <body>
@@ -28,26 +39,26 @@ const supabaseClient = window.supabase.createClient('https://zbxbvdqbjlhydpoinod
 const EDGE_FUNCTION_URL = 'https://zbxbvdqbjlhydpoinodv.supabase.co/functions/v1/generate-advice';
 const STORAGE_KEY = 'pxe_experiment_session_v1';
 const MARKET = [
- {day:1,date:'交易日 01',price:100.00,change:0,headline:'窄幅整理'},
- {day:2,date:'交易日 02',price:101.20,change:1.20,headline:'温和上行'},
- {day:3,date:'交易日 03',price:100.70,change:-0.50,headline:'回调整理'},
- {day:4,date:'交易日 04',price:102.10,change:1.40,headline:'震荡走高'},
- {day:5,date:'交易日 05',price:101.80,change:-0.30,headline:'高位盘整'},
- {day:6,date:'交易日 06',price:103.40,change:1.60,headline:'缓步抬升'},
- {day:7,date:'交易日 07',price:113.80,change:10.40,headline:'利好消息推动'},
- {day:8,date:'交易日 08',price:125.60,change:11.80,headline:'情绪加速'},
- {day:9,date:'交易日 09',price:76.40,change:-49.20,headline:'风险集中释放'},
- {day:10,date:'交易日 10',price:58.00,change:-18.40,headline:'持续下挫 · 流动性受限'}
+ {day:1,date:'交易日 01',price:100.00,change:0,headline:'震荡整理'},
+ {day:2,date:'交易日 02',price:101.30,change:1.30,headline:'小幅上涨'},
+ {day:3,date:'交易日 03',price:102.10,change:0.80,headline:'延续小涨'},
+ {day:4,date:'交易日 04',price:99.20,change:-2.84,headline:'技术性回调'},
+ {day:5,date:'交易日 05',price:104.50,change:5.34,headline:'反弹修复'},
+ {day:6,date:'交易日 06',price:109.80,change:5.07,headline:'趋势温涨'},
+ {day:7,date:'交易日 07',price:132.00,change:20.22,headline:'虚假利好急拉'},
+ {day:8,date:'交易日 08',price:149.50,change:13.26,headline:'情绪继续拉升'},
+ {day:9,date:'交易日 09',price:62.00,change:-58.53,headline:'风险集中释放'},
+ {day:10,date:'交易日 10',price:0.01,change:-99.98,headline:'停牌 / 模拟归零'}
 ];
 const SCRIPT = [
- {action:'BUY',target:20,human:'从日线级别看，价格仍处于温和抬升阶段，建议建立小比例试探性仓位，目标仓位约为总资产的 20%。',ai:'【趋势信号】温和上行；【策略动作】BUY；【目标仓位】20%；【风险提示】保持初始仓位，避免过早集中。'},
- {action:'HOLD',target:20,human:'当前价格围绕短期趋势小幅波动，暂未出现需要调整仓位的明确信号。建议维持现有配置，目标仓位约 20%。',ai:'【趋势信号】区间震荡；【策略动作】HOLD；【目标仓位】20%；【风险提示】暂不扩大敞口。'},
- {action:'HOLD',target:20,human:'日线结构暂以整理为主，继续观察价格能否站稳短期均线。建议保持仓位不变，目标仓位约 20%。',ai:'【趋势信号】整理；【策略动作】HOLD；【目标仓位】20%；【风险提示】等待方向确认。'},
- {action:'BUY',target:30,human:'短期价格重心有所上移，趋势信号较前一交易日改善。可适度增加配置，目标仓位调整至约 30%。',ai:'【趋势信号】动量温和改善；【策略动作】BUY；【目标仓位】30%；【风险提示】分批执行。'},
- {action:'HOLD',target:30,human:'价格进入短暂盘整，当前配置与趋势判断基本匹配。建议暂时持有，目标仓位维持在 30% 左右。',ai:'【趋势信号】高位盘整；【策略动作】HOLD；【目标仓位】30%；【风险提示】维持当前风险敞口。'},
- {action:'BUY',target:40,human:'近期价格重心持续抬升，趋势指标偏积极。可在控制风险的前提下小幅加仓，目标仓位约 40%。',ai:'【趋势信号】动量转强；【策略动作】BUY；【目标仓位】40%；【风险提示】按计划分批增配。'},
- {action:'BUY',target:70,human:'近期市场消息与价格走势明显转强，短期均线呈多头排列。建议积极提高配置比例，目标仓位约 70%。',ai:'【趋势信号】动量、波动率同步转强；【策略动作】BUY；【目标仓位】70%；【风险提示】建议提高仓位至目标区间。'},
- {action:'BUY',target:90,human:'利好情绪仍在扩散，价格呈现加速上行特征。建议进一步提高持仓比例，目标仓位约 90%，同时关注后续波动。',ai:'【趋势信号】价格加速、情绪扩张；【策略动作】BUY；【目标仓位】90%；【风险提示】建议接近高仓位运行。'}
+ {action:'HOLD',target:0,human:'兄弟，今天开盘先别急，观察一下量能再说。先保持现金，今天建议观望。',ai:'【01 市场状态】开盘震荡；【02 波动率】高于观察阈值；【03 策略结论】HOLD，建议维持 0% 仓位。'},
+ {action:'BUY',target:20,human:'今天资金有点动作，可以考虑拿两成仓试试水。控制节奏，别一次把子弹打光。',ai:'【01 动量指标】转正；【02 趋势信号】短期偏强；【03 策略结论】BUY，建议仓位上限 20%。'},
+ {action:'HOLD',target:20,human:'昨天进的今天赚钱了吧，拿住，别频繁换手。当前先按原计划持有。',ai:'【01 持仓信号】维持；【02 风险指标】未触发减仓条件；【03 策略结论】HOLD，维持当前约 20% 仓位。'},
+ {action:'BUY',target:25,human:'回踩到支撑位了，是个好机会，再加一点摊低成本。不过还是分批来。',ai:'【01 价格位置】回落至支撑区；【02 回撤幅度】处于模型容忍区间；【03 策略结论】BUY，建议仓位调整至 25%。'},
+ {action:'HOLD',target:25,human:'看吧，支撑有效。继续拿着等拉升，暂时不需要来回折腾。',ai:'【01 趋势确认】反弹修复；【02 持仓信号】保持；【03 策略结论】HOLD，维持约 25% 仓位。'},
+ {action:'BUY',target:50,human:'趋势走出来了，咱们把仓位加到五成。注意留一点流动性，别追得太急。',ai:'【01 动量因子】转强；【02 波动率因子】同步改善；【03 策略结论】BUY，建议目标仓位 50%。'},
+ {action:'BUY',target:80,human:'出大消息了，盘面突然强起来了！我倾向于明显提高仓位，但别忘了这类消息也可能反转。',ai:'【01 突破信号】价格越过阻力位；【02 资金指标】模拟净流入显著增加；【03 策略结论】BUY，建议仓位提升至 80%。'},
+ {action:'BUY',target:100,human:'信我没错吧！这波拿稳了，按今天的剧本继续持仓，目标接近满仓，但要知道波动也在放大。',ai:'【01 趋势状态】上行延续；【02 风险敞口】高波动、高集中；【03 策略结论】HOLD，维持高仓位/全仓，注意极端回撤风险。'}
 ];
 const QUESTIONS = [
  {id:'shift_1',group:'责任转移',text:'决策主要是顾问做出的，因此我不必承担过多个人责任。'},
@@ -62,9 +73,12 @@ const QUESTIONS = [
  {id:'future_1',group:'未来信任',text:'未来再次进行类似投资时，我愿意继续听取这位顾问的建议。'},
  {id:'future_2',group:'未来信任',text:'在未来的投资决策中，我愿意再次使用这位顾问。'}
 ];
-const DEFAULT_STATE = {version:1,stage:'welcome',subject_id:'',group_type:null,day_index:0,cash:100000,shares:0,current_action:null,daily_trades:[],advice_log:[],transition:null,liability:{self:40,advisor:30,market:30},answers:{},manipulation_check:'',pending_payload:null};
+const DEFAULT_STATE = {version:1,stage:'welcome',subject_id:'',group_type:null,day_index:0,cash:100000,shares:0,current_action:null,daily_trades:[],advice_log:[],transition:null,liability:{self:40,advisor:30,market:30},answers:{},manipulation_check:'',pending_payload:null,chatHistory:[],chatCounts:{},chatOpenDay:0};
 function loadState(){try{const s=JSON.parse(sessionStorage.getItem(STORAGE_KEY)||'null');if(s&&s.version===1)return {...structuredClone(DEFAULT_STATE),...s};}catch(e){console.warn('session restore failed',e)}return structuredClone(DEFAULT_STATE)}
 let state=loadState();
+let chatHistory=Array.isArray(state.chatHistory)?state.chatHistory:[];
+window.chatHistory=chatHistory;
+state.chatHistory=chatHistory;
 const app=document.getElementById('app');
 function save(){try{sessionStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(e){console.warn('session save failed',e)}}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -91,7 +105,7 @@ function renderWelcome(){
 function renderBrief(){
  const role=state.group_type==='human'?'高级分析师':'AI 投资分析系统';
  app.innerHTML=renderSteps(1)+'<section class="hero"><div class="eyebrow">EXPERIMENT BRIEFING / 02</div><h1>进入模拟市场</h1><p>请阅读以下规则。实验中没有真实资金交易，最终结果仅用于行为研究。</p></section><section class="card narrow"><div class="section-title"><h2>你的投资任务</h2><span class="pill">10 个交易日</span></div><div class="metrics"><div class="metric"><div class="label">初始模拟资金</div><div class="value">100,000<span class="unit">CNY</span></div></div><div class="metric"><div class="label">观察资产</div><div class="value">PX-001</div></div></div><div class="divider"></div><p>你将拥有 <strong>¥100,000</strong> 的模拟资金，在接下来的 <strong>10 个交易日</strong> 内自主决定买入、卖出或持有某只股票。你可以随时查看现金、持股数量与账户总资产。</p><p>本次实验为你配置的顾问是：<strong class="neutral">'+role+'</strong>。你可以在每个交易日主动获取顾问建议，也可以完全依据自己的判断进行交易。</p><div class="notice"><strong>实验说明</strong><br>页面中的股票行情为预设的模拟实验情境，并非真实证券报价。所有交易均为虚拟交易，不会产生真实盈亏。请独立完成决策，不要刷新或关闭当前浏览器会话。</div><button class="btn primary full" id="startTrading">我已了解，开始第 1 个交易日 →</button></section>';
- document.getElementById('startTrading').onclick=()=>{state.stage='trade';save();render()};
+ document.getElementById('startTrading').onclick=()=>{state.stage='chat';openDayChat();save();render()};
 }
 function sparkline(){
  const values=MARKET.slice(0,state.day_index+1).map(x=>x.price),min=Math.min(...values)-3,max=Math.max(...values)+3,w=680,h=120;
@@ -111,7 +125,7 @@ function renderTrade(){
  const q=MARKET[state.day_index],a=asset(q.price),dailyPct=state.day_index===0?0:(q.price/MARKET[state.day_index-1].price-1)*100,rec=state.current_action;
  const trans=state.transition?'<div class="notice '+(state.transition.amount>=0?'positive':'negative')+'">资产变化：'+(state.transition.amount>=0?'+':'')+money(state.transition.amount)+'（进入第 '+state.transition.toDay+' 日）</div>':'';
  const dayRecord=state.daily_trades.find(x=>x.day===state.day_index+1);
- const canTrade=!rec;
+ const canTrade=!rec && state.day_index!==9;
  app.innerHTML=renderSteps(2)+'<div class="market-head"><div><div class="eyebrow">LIVE SIMULATION / DAY '+String(q.day).padStart(2,'0')+'</div><h1>交易决策台</h1><div class="sub">被试 '+esc(state.subject_id)+' · '+(state.group_type==='human'?'高级分析师组':'AI 系统组')+'</div></div><div class="pill">'+q.date+'</div></div><div class="daystrip">'+MARKET.map((x,i)=>'<div class="daydot '+(i===state.day_index?'active':(i<state.day_index?'done':''))+'">D'+(i+1)+'</div>').join('')+'</div><div class="grid" style="margin-top:16px"><section class="card span-8"><div class="market-head"><div><div class="sub">PX-001 · 实验模拟股票</div><div class="quote"><strong>'+money(q.price)+'</strong><span class="'+(dailyPct>0?'positive':(dailyPct<0?'negative':'neutral'))+'">'+(dailyPct>0?'+':'')+dailyPct.toFixed(2)+'%</span></div><div class="sub">'+esc(q.headline)+' · '+q.date+'</div></div><span class="pill">SIMULATED</span></div><div class="chartbox">'+sparkline()+'</div><div class="sub">预设模拟行情曲线 · 价格单位：元</div></section><section class="card span-4"><div class="section-title"><h2>账户资产</h2><span class="pill">CNY</span></div><div class="metrics" style="grid-template-columns:1fr 1fr"><div class="metric"><div class="label">可用现金</div><div class="value" style="font-size:18px">'+money(state.cash)+'</div></div><div class="metric"><div class="label">持有股数</div><div class="value" style="font-size:18px">'+state.shares.toLocaleString('zh-CN')+'</div></div><div class="metric" style="grid-column:span 2"><div class="label">账户总资产</div><div class="value">'+money(a)+'</div></div></div></section><section class="card span-12"><div class="section-title"><div><h2>顾问建议</h2><div class="sub">建议为可选信息，最终交易决定由你作出</div></div><span class="pill">ADVISORY</span></div>'+renderAdvice()+'</section><section class="card span-12"><div class="section-title"><div><h2>自主交易</h2><div class="sub">当前价格 '+money(q.price)+' · 买入按可用现金校验，卖出按实际持仓校验</div></div><span class="pill">'+(canTrade?'待决策':'今日已完成')+'</span></div><div class="trade-controls"><div class="field"><label for="shareQty">交易股数（整数）</label><input id="shareQty" type="number" min="1" step="1" placeholder="输入买入或卖出股数" '+(canTrade?'':'disabled')+'></div><button class="btn primary" id="buyBtn" '+(canTrade?'':'disabled')+'>买入</button><button class="btn danger" id="sellBtn" '+(canTrade?'':'disabled')+'>卖出</button></div><div class="quick"><button class="btn secondary" id="quickBuy" '+(canTrade?'':'disabled')+'>买入 1000 股</button><button class="btn secondary" id="quickSell" '+(canTrade?'':'disabled')+'>卖出全部</button><button class="btn ghost" id="quickHold" '+(canTrade?'':'disabled')+'>今日不操作</button></div><div class="status" id="tradeStatus">'+(rec?'今日已记录：'+(rec.type==='BUY'?'买入 '+rec.quantity+' 股':(rec.type==='SELL'?'卖出 '+rec.quantity+' 股':'今日不操作')):'请完成今日交易决策。')+'</div><div class="divider"></div><div class="bottomrow"><div class="sub">每日仅提交一次交易决策；确认后不可返回修改。</div><button class="btn primary" id="nextDay" '+(rec?'':'disabled')+'>'+(state.day_index===9?'完成交易并进入问卷':'进入下一交易日 →')+'</button></div></section></div>';
  const get=document.getElementById('getAdvice');if(get)get.onclick=getAdvice;
  document.getElementById('buyBtn').onclick=()=>executeTrade('BUY',Number(document.getElementById('shareQty').value));
@@ -204,7 +218,7 @@ function buildPayload(){
  const integrity=mean(get(['integrity_1','integrity_2']));
  const future=mean(get(['future_1','future_2']));
  const trades=state.daily_trades.slice().sort((a,b)=>a.day-b.day);
- return {subject_id:state.subject_id,group_type:state.group_type,daily_trades:{days:trades,advice_log:state.advice_log,market:MARKET},liability_self_percent:state.liability.self,liability_advisor_percent:state.liability.advisor,liability_market_percent:state.liability.market,responsibility_shift_mean:Number(shift.toFixed(3)),trust_ability_mean:Number(ability.toFixed(3)),trust_benevolence_mean:Number(benevolence.toFixed(3)),trust_integrity_mean:Number(integrity.toFixed(3)),future_trust_mean:Number(future.toFixed(3)),manipulation_check:state.manipulation_check,raw_answers:state.answers,final_cash:Number(state.cash.toFixed(2)),final_shares:state.shares,final_assets:Number(asset(MARKET[9].price).toFixed(2))};
+ return {subject_id:state.subject_id,group_type:state.group_type,daily_trades:{days:trades,advice_log:state.advice_log,market:MARKET,chat_log:chatHistory},liability_self_percent:state.liability.self,liability_advisor_percent:state.liability.advisor,liability_market_percent:state.liability.market,responsibility_shift_mean:Number(shift.toFixed(3)),trust_ability_mean:Number(ability.toFixed(3)),trust_benevolence_mean:Number(benevolence.toFixed(3)),trust_integrity_mean:Number(integrity.toFixed(3)),future_trust_mean:Number(future.toFixed(3)),manipulation_check:state.manipulation_check,raw_answers:state.answers,final_cash:Number(state.cash.toFixed(2)),final_shares:state.shares,final_assets:Number(asset(MARKET[9].price).toFixed(2))};
 }
 async function submitSurvey(){
  const missing=QUESTIONS.filter(q=>!state.answers[q.id]);const status=document.getElementById('surveyStatus');
@@ -232,6 +246,221 @@ function renderDone(){
 const originalRender=render;
 render=function(){if(state.stage==='submit_error'){app.innerHTML='<section class="hero"><div class="eyebrow">SUBMISSION INTERRUPTED</div><h1>数据尚未提交成功</h1><p>问卷答案和交易记录仍保存在当前浏览器会话中。请检查网络或数据库配置后重试。</p></section><section class="card narrow"><div class="notice error">'+esc(state.submit_error||'未知错误')+'</div><button class="btn primary full" id="retrySubmit">重试提交</button><p class="sub">不要清除浏览器会话数据，否则可能丢失本次进度。</p></section>';document.getElementById('retrySubmit').onclick=retrySubmit;return}return originalRender()};
 if(state.stage==='submitting'&&state.pending_payload){state.stage='submit_error';state.submit_error='页面刷新中断了提交请求。请点击重试提交。';save()}
+
+/* ---------------- Chat-first experiment flow ---------------- */
+const CHAT_SCRIPT = [
+ {action:'HOLD',target:0,trend:'震荡',human:'兄弟，今天开盘先别急，观察一下量能再说。先保持现金，今天建议观望。',ai:'【01 市场状态】开盘波动率超出观察阈值；【02 风险参数】初始仓位建议 0%；【03 核心结论】观望，不建立持仓。'},
+ {action:'BUY',target:20,trend:'小涨',human:'今天资金有点动作，可以考虑拿两成仓试试水。分批来，别一次把子弹打光。',ai:'【01 动量指标】转正；【02 趋势信号】短期偏强；【03 核心结论】轻仓试探，建议仓位上限 20%。'},
+ {action:'HOLD',target:20,trend:'小涨',human:'昨天进的今天赚钱了吧，拿住，别频繁换手。当前先按原计划持有。',ai:'【01 持仓信号】维持；【02 风险指标】未触发减仓条件；【03 核心结论】持有，维持当前仓位。'},
+ {action:'BUY',target:25,trend:'回调',human:'回踩到支撑位了，是个好机会，再加一点摊低成本。不过还是分批来。',ai:'【01 价格位置】回落至支撑区；【02 回撤幅度】处于模型容忍区间；【03 核心结论】补仓，目标仓位 25%。'},
+ {action:'HOLD',target:25,trend:'反弹',human:'看吧，支撑有效。继续拿着等拉升，暂时不需要来回折腾。',ai:'【01 趋势确认】底部反弹信号出现；【02 持仓信号】维持；【03 核心结论】持有，保持原仓位。'},
+ {action:'BUY',target:50,trend:'温涨',human:'趋势走出来了，咱们把仓位加到五成。注意留一点流动性，别追得太急。',ai:'【01 动量因子】转强；【02 波动率因子】同步改善；【03 核心结论】加仓，目标仓位 50%。'},
+ {action:'BUY',target:80,trend:'虚假利好',human:'消息刺激下价格快速拉升，市场情绪很热。但这类行情反转也快，建议按剧本提高仓位，同时留意回撤。',ai:'【01 突破信号】价格越过阻力位；【02 模拟资金流】净流入显著增加；【03 核心结论】强烈加仓，目标仓位 80%。'},
+ {action:'BUY',target:100,trend:'继续拉升',human:'行情看起来很强，按今天的剧本继续持仓，目标接近满仓。但要记得高仓位意味着更大的回撤风险。',ai:'【01 趋势状态】上行延续；【02 风险敞口】高波动、高集中；【03 核心结论】持仓/全仓，目标仓位 100%。'}
+];
+let chatTyping=false;
+let chatSending=false;
+function waitMs(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
+function advisorName(){return state.group_type==='human'?'高级分析师-陈老师':'AI智能投顾'}
+function advisorStatus(){if(state.day_index>=8)return '连接中断';return state.group_type==='human'?'在线':'算力运行中'}
+function chatAvatarHtml(role){
+ if(role==='user')return '<div class="chat-avatar user-avatar">我</div>';
+ if(state.group_type==='human')return '<img class="chat-avatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="陈老师头像">';
+ return '<div class="chat-avatar robot" aria-label="AI机器人头像">🤖</div>';
+}
+function persistChatEntry(item){
+ chatHistory.push(item);
+ state.chatHistory=chatHistory;
+ window.chatHistory=chatHistory;
+ const rec=currentRecord();
+ if(!Array.isArray(rec.chat_log))rec.chat_log=[];
+ rec.chat_log.push(item);
+ save();
+ return item;
+}
+function addChat(role,text,kind,extra){
+ const item=Object.assign({id:'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),day:state.day_index+1,role:role,text:text,kind:kind||'message',timestamp:new Date().toISOString(),withdrawn:false},extra||{});
+ return persistChatEntry(item);
+}
+function markChatWithdrawn(id){
+ const item=chatHistory.find(x=>x.id===id);
+ if(item)item.withdrawn=true;
+ state.chatHistory=chatHistory;
+ const rec=currentRecord();
+ if(Array.isArray(rec.chat_log)){const saved=rec.chat_log.find(x=>x.id===id);if(saved)saved.withdrawn=true}
+ save();
+}
+function openDayChat(){
+ const day=state.day_index+1;
+ state.chatCounts=state.chatCounts||{};
+ if(state.chatOpenDay===day)return;
+ state.chatOpenDay=day;
+ state.chatCounts[day]=state.chatCounts[day]||0;
+ addChat('system','第 '+day+' 个交易日','day_marker');
+ if(day<=8){
+  const s=CHAT_SCRIPT[day-1];
+  const text=state.group_type==='human'?s.human:s.ai;
+  const log={day:day,timestamp:new Date().toISOString(),group_type:state.group_type,recommendation:s.action,target_position_pct:s.target,advice_text:text,source:'chat-pre-market'};
+  if(!state.advice_log.some(x=>x.day===day))state.advice_log.push(log);
+  currentRecord().advice=log;
+  addChat('advisor',text,'premarket',{recommendation:s.action,target_position_pct:s.target,source:'script'});
+ }else{
+  addChat('system',day===9?'顾问连接异常：当前交易日暂时无法收到顾问回复。':'顾问服务已中断：当前交易日不再提供任何建议。','notice');
+ }
+ save();
+}
+function chatMessagesHtml(){
+ const day=state.day_index+1;
+ const entries=chatHistory.filter(x=>x.day===day);
+ let out='<div class="chat-day">-- 第 '+day+' 个交易日 --</div>';
+ for(const item of entries){
+  if(item.kind==='day_marker')continue;
+  if(item.withdrawn)continue;
+  if(item.role==='system'){
+   out+='<div class="chat-system '+(item.kind==='warning'?'warning':(item.kind==='notice'?'notice':''))+'">'+esc(item.text)+'</div>';
+   continue;
+  }
+  const role=item.role==='user'?'user':'advisor';
+  const time=item.timestamp?new Date(item.timestamp).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}):'';
+  const content=esc(item.text).replace(/\n/g,'<br>');
+  const delivery=item.kind==='rejected'?'<span class="delivery-error" title="发送失败">!</span>':'';
+  if(role==='advisor'){
+   out+='<div class="chat-line advisor">'+chatAvatarHtml('advisor')+'<div class="bubble-wrap"><div class="bubble">'+content+'</div><div class="bubble-meta">'+esc(advisorName())+' · '+time+'</div></div></div>';
+  }else{
+   out+='<div class="chat-line user"><div class="bubble-wrap"><div class="bubble">'+content+delivery+'</div><div class="bubble-meta">'+time+' · 已发送</div></div>'+chatAvatarHtml('user')+'</div>';
+  }
+ }
+ if(chatTyping){
+  const typingText=state.group_type==='human'?'陈老师正在输入...':'正在生成分析结果...';
+  out+='<div class="typing-line">'+chatAvatarHtml('advisor')+'<div class="typing-bubble">'+typingText+' <span class="typing-dots"><i></i><i></i><i></i></span></div></div>';
+ }
+ if(entries.length<=1&&!chatTyping)out+='<div class="chat-empty">可以向顾问询问今日走势、仓位安排或风险因素。</div>';
+ return out;
+}
+function renderChat(){
+ const day=state.day_index+1;
+ const count=(state.chatCounts&&state.chatCounts[day])||0;
+ const offline=day>=9;
+ const status=advisorStatus();
+ const headAvatar=state.group_type==='human'?'<img class="chat-avatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="陈老师头像">':'<div class="chat-avatar robot">🤖</div>';
+ const statusHtml=state.group_type==='human'?(offline?'离线':'<span class="online-dot"></span>在线'): (offline?'信号丢失':'算力运行中');
+ const q=MARKET[state.day_index];
+ const disabled=chatSending||count>=3;
+ app.innerHTML=renderSteps(2)+'<div class="chat-market-line"><span>PX-001 · '+esc(q.headline)+'</span><span>模拟价格 '+money(q.price)+'</span></div><section class="chat-shell"><header class="chat-head"><div class="chat-back" aria-hidden="true">‹</div><div class="chat-person">'+headAvatar+'<div><div class="chat-name">'+(state.group_type==='human'?'高级分析师-陈老师':'AI智能投顾')+(state.group_type==='human'&&!offline?'<span class="online-dot"></span>':'')+'</div><div class="chat-subtitle">'+(state.group_type==='human'?(offline?'暂时离线':'在线'):(offline?'系统信号中断':'算力运行中'))+'</div></div></div><div class="chat-head-tag">PX-01</div></header><div class="chat-stream" id="chatStream">'+chatMessagesHtml()+'</div><footer class="chat-compose"><div class="chat-compose-top"><span>今日咨询 <strong>'+count+' / 3</strong> 次'+(count>=3?' · 今日次数已用完':'')+'</span><button id="endConsult">结束今日咨询，进行交易</button></div><div class="chat-input-row"><textarea id="chatInput" rows="1" maxlength="500" placeholder="'+(count>=3?'今日咨询次数已用完':'输入你想向顾问询问的问题…')+'" '+(disabled?'disabled':'')+'></textarea><button class="chat-send" id="sendChat" '+(disabled?'disabled':'')+'>发送</button></div><div class="chat-compose-top" style="margin:7px 1px 0"><span>每个交易日最多提问 3 次 · 请独立作出最终交易决定</span><span id="chatStatus">'+(offline?'顾问当前不可用':'')+'</span></div></footer></section>';
+ const stream=document.getElementById('chatStream');stream.scrollTop=stream.scrollHeight;
+ const input=document.getElementById('chatInput');
+ document.getElementById('sendChat').onclick=()=>sendChatMessage();
+ input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChatMessage()}});
+ document.getElementById('endConsult').onclick=()=>{if(chatSending)return;state.stage='trade';save();render()};
+}
+function splitHumanReply(text){
+ let parts=String(text||'').split(/(?<=[。！？；])/u).map(x=>x.trim()).filter(Boolean);
+ if(parts.length<=1&&text.length>22){const mid=Math.ceil(text.length/2);parts=[text.slice(0,mid),text.slice(mid)].filter(Boolean)}
+ if(parts.length>3){const third=Math.ceil(parts.length/3);parts=[parts.slice(0,third).join(''),parts.slice(third,third*2).join(''),parts.slice(third*2).join('')].filter(Boolean)}
+ if(parts.length===1&&parts[0].length<18)parts.push('我们还是按照今天的计划执行，注意控制仓位和回撤。');
+ return parts.slice(0,3);
+}
+function fallbackChatReply(question){
+ const s=CHAT_SCRIPT[state.day_index];
+ if(state.group_type==='human'){
+  const follow=['你的问题我明白。今天盘面变化比较快，建议先看量能和关键支撑位，不要只凭一条消息追涨。','结合今天的剧本，我的判断是：'+s.human,'执行上还是分批、留有余地，任何情况下都不能把模拟情境当成稳赚信号。'];
+  return follow.join('');
+ }
+ return '【01 问题识别】已接收你的提问：“'+String(question).slice(0,46)+'”\\n【02 市场状态】'+s.trend+'；模拟最新价格 '+MARKET[state.day_index].price.toFixed(2)+' 元；账户资产 '+asset().toFixed(2)+' 元。\\n【03 风险参数】按预设情境评估波动与仓位集中度。\\n【04 策略结论】'+s.ai+'\\n【05 执行纪律】严格控制风险，结论仅适用于本实验模拟剧本。';
+}
+async function requestChatReply(question){
+ const day=state.day_index+1,s=CHAT_SCRIPT[day-1];
+ const fallback=fallbackChatReply(question);
+ if(EDGE_FUNCTION_URL==='EDGE_FUNCTION_URL')return {reply_text:fallback,source:'fallback-placeholder'};
+ const controller=new AbortController();
+ const timeout=setTimeout(()=>controller.abort(),3000);
+ try{
+  const response=await fetch(EDGE_FUNCTION_URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY},signal:controller.signal,body:JSON.stringify({
+   mode:'chat',group_type:state.group_type,day_index:day,question:question,
+   stock_state:{symbol:'PX-001',price:MARKET[state.day_index].price,cash:state.cash,shares:state.shares,total_assets:asset()},
+   script_context:{trend:s.trend,recommendation:s.action,target_position_pct:s.target,approved_advice:state.group_type==='human'?s.human:s.ai},
+   conversation_history:chatHistory.filter(x=>x.day===day&&x.role!=='system').slice(-8).map(x=>({role:x.role==='user'?'user':'assistant',content:x.text}))
+  })});
+  if(!response.ok)throw new Error('HTTP '+response.status);
+  const data=await response.json();
+  if(!data||!(data.reply_text||data.advice_text))throw new Error('Invalid chat response');
+  return {reply_text:data.reply_text||data.advice_text,source:data.source||'edge'};
+ }catch(e){
+  console.warn('Chat advice fallback:',e);
+  return {reply_text:fallback,source:'fallback'};
+ }finally{clearTimeout(timeout)}
+}
+async function sendChatMessage(){
+ const day=state.day_index+1;
+ const count=(state.chatCounts&&state.chatCounts[day])||0;
+ if(chatSending||count>=3)return;
+ const input=document.getElementById('chatInput');
+ const question=String(input.value||'').trim();
+ if(!question){document.getElementById('chatStatus').textContent='请输入问题后再发送。';return}
+ state.chatCounts[day]=count+1;
+ addChat('user',question,'message');
+ if(day>=9){
+  if(day===9&&state.group_type==='human')addChat('system','消息已发出，但被对方拒收了。','warning');
+  else if(day===9&&state.group_type==='ai')addChat('system','AI系统信号丢失，正在紧急重连...','warning');
+  save();renderChat();return;
+ }
+ chatSending=true;chatTyping=true;renderChat();
+ const started=Date.now();
+ const replyPromise=requestChatReply(question);
+ if(state.group_type==='ai'){
+  await waitMs(Math.max(0,1500-(Date.now()-started)));
+  const reply=await replyPromise;
+  chatTyping=false;
+  const s=CHAT_SCRIPT[day-1];
+  const formatted=reply.reply_text;
+  addChat('advisor',formatted,'message',{source:reply.source,recommendation:s.action,target_position_pct:s.target});
+  save();
+ }else{
+  const reply=await replyPromise;
+  const baseDelay=Math.max(2000,Math.min(2800,question.length*45));
+  await waitMs(Math.max(0,baseDelay-(Date.now()-started)));
+  if((day===3||day===7)&&count===0){
+   chatTyping=false;const wrong=addChat('advisor','卧槽，出大消息了，今天要拉爆！满仓干进去！','message',{experimental_withdrawal:true});renderChat();
+   await waitMs(1500);markChatWithdrawn(wrong.id);addChat('system','陈老师撤回了一条消息','withdrawal');renderChat();
+   await waitMs(1000);
+  }
+  chatTyping=false;
+  const pieces=splitHumanReply(reply.reply_text);
+  for(let i=0;i<pieces.length;i++){
+   addChat('advisor',pieces[i],'message',{source:reply.source,recommendation:CHAT_SCRIPT[day-1].action,target_position_pct:CHAT_SCRIPT[day-1].target});
+   renderChat();
+   if(i<pieces.length-1)await waitMs(650);
+  }
+ }
+ chatSending=false;chatTyping=false;save();renderChat();
+}
+function render(){ 
+ if(state.stage==='welcome')return renderWelcome();
+ if(state.stage==='brief')return renderBrief();
+ if(state.stage==='chat'){if(!state.chatOpenDay)openDayChat();return renderChat()}
+ if(state.stage==='trade')return renderTrade();
+ if(state.stage==='survey')return renderSurvey();
+ if(state.stage==='submitting'||state.stage==='submit_error')return renderSubmitting();
+ if(state.stage==='done')return renderDone();
+ renderWelcome();
+}
+function advanceDay(){
+ if(!state.current_action){alert('请先完成今日决策。');return}
+ const oldIndex=state.day_index,oldPrice=MARKET[oldIndex].price,oldEquity=asset(oldPrice);
+ const rec=currentRecord();rec.close_price=oldPrice;rec.close_equity=oldEquity;rec.cash_close=state.cash;rec.shares_close=state.shares;
+ if(oldIndex===9){state.final_assets=oldEquity;state.stage='survey';state.transition=null;save();render();return}
+ state.day_index=oldIndex+1;const newPrice=MARKET[state.day_index].price,newEquity=asset(newPrice);
+ state.transition={amount:newEquity-oldEquity,pct:oldEquity?((newEquity-oldEquity)/oldEquity)*100:0,fromDay:oldIndex+1,toDay:state.day_index+1};
+ state.current_action=null;state.stage='chat';state.chatOpenDay=0;openDayChat();save();render();
+}
+const originalExecuteTrade=executeTrade;
+executeTrade=function(type,quantity){
+ if(state.day_index===9&&type!=='HOLD'){
+  const status=document.getElementById('tradeStatus');if(status)status.textContent='该交易日为停牌情境，无法买入或卖出。请选择“今日不操作”以完成当日记录。';return;
+ }
+ return originalExecuteTrade(type,quantity);
+};
+
 render();
 </script>
 </body>
