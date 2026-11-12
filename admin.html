@@ -97,7 +97,7 @@ function showDetail(id){
  const adv=Array.isArray(d.advice_log)?d.advice_log:(r.advice_log||[]);
  $('detailTitle').textContent='被试详情 · '+r.subject_id;$('detailMeta').textContent=(r.group_type==='human'?'高级分析师组':'AI 系统组')+' · 提交时间 '+(r.created_at?new Date(r.created_at).toLocaleString('zh-CN'):'未知');
  $('tradeDetail').textContent=JSON.stringify({daily_trades:days,final_cash:r.final_cash,final_shares:r.final_shares,final_assets:r.final_assets},null,2);
- $('adviceDetail').textContent=JSON.stringify(adv,null,2);
+ $('adviceDetail').textContent=JSON.stringify({advice_log:adv,chat_log:Array.isArray(d.chat_log)?d.chat_log:(r.chat_log||[])},null,2);
  $('detailPanel').style.display='block';$('detailPanel').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function csvCell(v){let s=typeof v==='object'&&v!==null?JSON.stringify(v):String(v??'');if(/^[\s]*[=+\-@]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'}
