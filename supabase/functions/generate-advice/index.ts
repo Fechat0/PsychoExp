@@ -187,7 +187,12 @@ function isAuthorizedPublishableKey(request: Request): boolean {
     try {
       const parsed = JSON.parse(rawPublishableKeys) as Record<string, unknown>;
       for (const value of Object.values(parsed)) {
-        if (typeof value === "string" && value.length > 0) candidates.add(value);
+        if (typeof value !== "string" || value.length === 0) continue;
+        // Supabase maps key aliases (for example "default") to env-var names.
+        // Resolve the env-var value first; retain literal values for compatibility.
+        const resolved = Deno.env.get(value);
+        if (resolved) candidates.add(resolved);
+        candidates.add(value);
       }
     } catch (_error) {
       // Fail closed if the platform-provided key map is malformed.
