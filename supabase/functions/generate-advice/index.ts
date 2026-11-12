@@ -99,7 +99,7 @@ async function generateConversationalReply(
   conversationHistory: Array<{ role: "user" | "assistant"; content: string }>,
 ): Promise<string | null> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 3000);
+  const timeout = setTimeout(() => controller.abort(), 2400);
   try {
     const url = Deno.env.get("LLM_API_URL") ?? "https://api.deepseek.com/chat/completions";
     const model = Deno.env.get("LLM_MODEL") ?? "deepseek-chat";
