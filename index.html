@@ -24,7 +24,7 @@ button,input{font:inherit}button{cursor:pointer}.shell{width:min(1160px,calc(100
 <script>
 const SUPABASE_URL = 'https://zbxbvdqbjlhydpoinodv.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_HRkpwvk3B-cw3c9FUs9Bcw_6K1vFSJf';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient('https://zbxbvdqbjlhydpoinodv.supabase.co', 'sb_publishable_HRkpwvk3B-cw3c9FUs9Bcw_6K1vFSJf');
 const EDGE_FUNCTION_URL = 'EDGE_FUNCTION_URL';
 const STORAGE_KEY = 'pxe_experiment_session_v1';
 const MARKET = [
@@ -132,7 +132,7 @@ async function getAdvice(){
  let advice,source='edge';
  try{
   const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),3200);
-  const response=await fetch(EDGE_FUNCTION_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctrl.signal});clearTimeout(timer);
+  const response=await fetch(EDGE_FUNCTION_URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY},body:JSON.stringify(body),signal:ctrl.signal});clearTimeout(timer);
   if(!response.ok)throw new Error('HTTP '+response.status);
   const data=await response.json();
   if(!data||!data.recommendation||!data.advice_text)throw new Error('Invalid advice payload');
@@ -224,7 +224,7 @@ async function sendPayload(){
 }
 function renderSubmitting(){app.innerHTML='<section class="hero"><div class="eyebrow">SECURE DATA SUBMISSION / 05</div><h1>正在提交实验数据</h1><p>请保持页面开启，不要关闭浏览器。</p></section><section class="card narrow center"><div class="success-mark">↻</div><p>正在将交易记录与问卷答案写入实验数据库……</p></section>'}
 function renderSubmitError(){render()}
-function retrySubmit(){state.stage='submitting';save();render()}
+function retrySubmit(){state.stage='submitting';save();render();sendPayload()}
 function renderDone(){
  app.innerHTML=renderSteps(4)+'<section class="hero"><div class="eyebrow">EXPERIMENT COMPLETED / 05</div><h1>感谢你的参与。</h1><p>交易记录与问卷答案已成功提交。你的参与为行为决策研究提供了重要数据。</p></section><section class="card narrow center"><div class="success-mark">✓</div><h2>提交成功</h2><p class="muted">参与编号：'+esc(state.subject_id)+'</p><div class="metrics" style="grid-template-columns:1fr 1fr;margin:20px 0"><div class="metric"><div class="label">最终模拟资产</div><div class="value">'+money(asset(MARKET[9].price))+'</div></div><div class="metric"><div class="label">累计持股</div><div class="value">'+state.shares.toLocaleString('zh-CN')+'</div></div></div><div class="notice">实验结束说明：本实验使用预设模拟行情与标准化顾问建议。前 8 个交易日的建议结论按实验方案固定，第 9–10 个交易日顾问不可用。行情不代表真实证券市场。</div><p class="sub">你现在可以关闭本页面。</p></section>';
 }
