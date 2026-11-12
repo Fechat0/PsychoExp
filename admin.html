@@ -54,11 +54,13 @@ function avg(rows,key){const values=rows.map(r=>Number(r[key])).filter(v=>Number
 function options(title,scaleMax){return {responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#b9cbe0',usePointStyle:true,boxWidth:8}},tooltip:{backgroundColor:'#0b1523',titleColor:'#fff',bodyColor:'#cfdaea'}},scales:{x:{ticks:{color:'#9bb0c9'},grid:{color:'#26384c'}},y:{beginAtZero:true,max:scaleMax,ticks:{color:'#9bb0c9'},grid:{color:'#26384c'}}}}}
 function destroyCharts(){Object.values(charts).forEach(c=>c.destroy());charts={}}
 function renderCharts(){
- destroyCharts();const h=groupRows('human'),a=groupRows('ai');
- const common={backgroundColor:['#5ea9ff','#39d5a1'],borderRadius:7,borderSkipped:false};
- charts.responsibility=new Chart($('responsibilityChart'),{type:'bar',data:{labels:['我自己','顾问','市场/运气'],datasets:[{label:'高级分析师组',data:['liability_self_percent','liability_advisor_percent','liability_market_percent'].map(k=>avg(h,k)),...common},{label:'AI 系统组',data:['liability_self_percent','liability_advisor_percent','liability_market_percent'].map(k=>avg(a,k)),...common}]},options:options('责任分配',100)});
- charts.shift=new Chart($('shiftChart'),{type:'bar',data:{labels:['责任转移均值'],datasets:[{label:'高级分析师组',data:[avg(h,'responsibility_shift_mean')],...common},{label:'AI 系统组',data:[avg(a,'responsibility_shift_mean')],...common}]},options:options('责任转移',7)});
- charts.trust=new Chart($('trustChart'),{type:'bar',data:{labels:['能力','仁慈','诚信'],datasets:[{label:'高级分析师组',data:['trust_ability_mean','trust_benevolence_mean','trust_integrity_mean'].map(k=>avg(h,k)),...common},{label:'AI 系统组',data:['trust_ability_mean','trust_benevolence_mean','trust_integrity_mean'].map(k=>avg(a,k)),...common}]},options:options('信任维度',7)});
+ destroyCharts();
+ const h=groupRows('human'),a=groupRows('ai');
+ const humanStyle={backgroundColor:'#5ea9ff',borderColor:'#5ea9ff',borderRadius:7,borderSkipped:false};
+ const aiStyle={backgroundColor:'#39d5a1',borderColor:'#39d5a1',borderRadius:7,borderSkipped:false};
+ charts.responsibility=new Chart($('responsibilityChart'),{type:'bar',data:{labels:['我自己','顾问','市场/运气'],datasets:[{label:'高级分析师组',data:['liability_self_percent','liability_advisor_percent','liability_market_percent'].map(k=>avg(h,k)),...humanStyle},{label:'AI 系统组',data:['liability_self_percent','liability_advisor_percent','liability_market_percent'].map(k=>avg(a,k)),...aiStyle}]},options:options('责任分配',100)});
+ charts.shift=new Chart($('shiftChart'),{type:'bar',data:{labels:['责任转移均值'],datasets:[{label:'高级分析师组',data:[avg(h,'responsibility_shift_mean')],...humanStyle},{label:'AI 系统组',data:[avg(a,'responsibility_shift_mean')],...aiStyle}]},options:options('责任转移',7)});
+ charts.trust=new Chart($('trustChart'),{type:'bar',data:{labels:['能力','仁慈','诚信'],datasets:[{label:'高级分析师组',data:['trust_ability_mean','trust_benevolence_mean','trust_integrity_mean'].map(k=>avg(h,k)),...humanStyle},{label:'AI 系统组',data:['trust_ability_mean','trust_benevolence_mean','trust_integrity_mean'].map(k=>avg(a,k)),...aiStyle}]},options:options('信任维度',7)});
 }
 async function fetchAll(){
  const pageSize=1000;let from=0,rows=[];
