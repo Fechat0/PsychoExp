@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080d16">
+<title>PX-01｜实验管理后台</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#080d16;--panel:#101a29;--panel2:#142235;--line:#263850;--muted:#8fa2ba;--text:#edf4ff;--green:#36d6a2;--red:#ff6f82;--blue:#75adff;--gold:#edbd6d}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(ellipse at 10% -5%,#17324a 0,transparent 34%),var(--bg);font:14px/1.55 Inter,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif}button,input{font:inherit}.wrap{width:min(1440px,calc(100% - 36px));margin:auto;padding:25px 0 60px}.top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1c2b3f;padding-bottom:20px;margin-bottom:28px}.brand{font-weight:850;letter-spacing:.06em;display:flex;align-items:center;gap:12px}.mark{width:38px;height:38px;background:linear-gradient(130deg,#36d6a2,#71aaff);border-radius:12px;color:#06141e;display:grid;place-items:center;font-weight:950}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.16em}.sub{color:var(--muted);font-size:12px}.pill{padding:5px 10px;border-radius:99px;background:#111e2f;border:1px solid #2b4059;color:#aabed5;font-size:11px}.card{background:linear-gradient(145deg,#111e2e,#0e1724);border:1px solid #273a52;border-radius:17px;padding:21px;box-shadow:0 15px 45px #0003}.login{max-width:450px;margin:9vh auto 0}.login h1{font-size:27px;margin:8px 0}.field{display:grid;gap:8px;margin:20px 0}.field label{color:#c4d3e5;font-weight:650;font-size:13px}.field input{background:#091421;border:1px solid #30445d;color:#fff;padding:13px 14px;border-radius:10px;outline:none}.field input:focus{border-color:var(--blue)}.btn{padding:10px 15px;border-radius:10px;border:0;background:linear-gradient(100deg,#2bd39d,#75b7ff);color:#06141d;font-weight:850;cursor:pointer}.btn.secondary{background:#192b41;border:1px solid #354b66;color:#d8e5f5}.btn:disabled{opacity:.5;cursor:wait}.error{color:#ff94a1;margin-top:12px;font-size:13px}.dashboard{display:none}.dashhead{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:18px 0 22px}.dashhead h1{margin:0;font-size:28px;letter-spacing:-.03em}.actions{display:flex;gap:9px;flex-wrap:wrap}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin:18px 0}.kpi{background:#101d2d;border:1px solid #293d55;border-radius:14px;padding:17px}.kpi label{color:var(--muted);font-size:12px}.kpi strong{display:block;font-size:28px;margin-top:4px;font-variant-numeric:tabular-nums}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.chartcard h3{margin:0 0 4px;font-size:15px}.chartwrap{height:255px;position:relative;margin-top:12px}.tablecard{margin-top:16px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px}.section-head h2{font-size:17px;margin:0}.search{background:#091421;border:1px solid #30445d;color:#fff;border-radius:9px;padding:9px 12px;width:230px;max-width:50vw}.table-scroll{overflow:auto;border:1px solid #26384e;border-radius:12px}table{border-collapse:collapse;width:100%;min-width:900px;font-size:12px}th,td{text-align:left;padding:12px 13px;border-bottom:1px solid #223348;white-space:nowrap}th{background:#142338;color:#9fb4cc;font-weight:750;position:sticky;top:0}tbody tr{cursor:pointer}tbody tr:hover{background:#16263a}tbody tr:last-child td{border-bottom:0}.group{padding:4px 8px;border-radius:99px;font-size:11px}.group.human{background:#172f49;color:#91c4ff}.group.ai{background:#15352f;color:#79e7c0}.view{color:#75b7ff;text-decoration:underline;text-underline-offset:3px}.detail{margin-top:16px;display:none}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.detail h3{margin:0 0 9px;font-size:14px}.detail pre{white-space:pre-wrap;word-break:break-word;background:#091421;border:1px solid #24364d;border-radius:10px;padding:13px;color:#bed0e5;font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;max-height:420px;overflow:auto}.empty{padding:35px;text-align:center;color:var(--muted)}.status{color:var(--muted);font-size:12px;margin-top:10px}.footer-note{margin-top:22px;border:1px solid #604b2d;background:#211c15;color:#c8b58f;border-radius:11px;padding:12px 14px;font-size:12px}
+@media(max-width:980px){.grid{grid-template-columns:1fr}.chartwrap{height:230px}.kpis{grid-template-columns:repeat(2,1fr)}}@media(max-width:620px){.wrap{width:calc(100% - 22px);padding-top:14px}.dashhead{align-items:flex-start;flex-direction:column}.kpis{gap:8px}.kpi{padding:13px}.kpi strong{font-size:23px}.section-head{align-items:flex-start;flex-direction:column}.search{width:100%;max-width:none}.detail-grid{grid-template-columns:1fr}.top .pill{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><div class="brand"><div class="mark">PX</div><div>DECISION LAB<small>EXPERIMENT ADMIN CONSOLE</small></div></div><span class="pill">PX-01 · RESEARCH DATA</span></header>
+<section id="loginPanel" class="card login">
+ <div class="sub">RESTRICTED AREA / PXE ADMIN</div><h1>实验管理后台</h1><p class="sub">请验证管理员口令以查看实验参与数据。</p>
+ <form id="loginForm"><div class="field"><label for="password">管理员密码</label><input id="password" type="password" autocomplete="current-password" placeholder="输入管理员密码" required></div><button class="btn" type="submit" style="width:100%">验证并进入后台 →</button><div id="loginError" class="error"></div></form>
+</section>
+<main id="dashboard" class="dashboard">
+ <div class="dashhead"><div><div class="sub">EXPERIMENT OVERVIEW</div><h1>数据总览</h1><div id="loadedAt" class="sub">等待加载数据库……</div></div><div class="actions"><button class="btn secondary" id="refreshBtn">↻ 刷新数据</button><button class="btn" id="exportBtn">↓ 导出 CSV</button><button class="btn secondary" id="logoutBtn">退出</button></div></div>
+ <div id="loadStatus" class="status"></div>
+ <section class="kpis"><div class="kpi"><label>有效样本</label><strong id="totalCount">—</strong></div><div class="kpi"><label>高级分析师组</label><strong id="humanCount">—</strong></div><div class="kpi"><label>AI 系统组</label><strong id="aiCount">—</strong></div><div class="kpi"><label>最近提交</label><strong id="lastSubmit" style="font-size:16px">—</strong></div></section>
+ <section class="grid">
+  <div class="card chartcard"><h3>责任归因分配</h3><div class="sub">三类责任比例均值（%）</div><div class="chartwrap"><canvas id="responsibilityChart"></canvas></div></div>
+  <div class="card chartcard"><h3>责任转移感知</h3><div class="sub">3 题均值（1–7 分）</div><div class="chartwrap"><canvas id="shiftChart"></canvas></div></div>
+  <div class="card chartcard"><h3>信任感知</h3><div class="sub">能力、仁慈、诚信均值（1–7 分）</div><div class="chartwrap"><canvas id="trustChart"></canvas></div></div>
+ </section>
+ <section class="card tablecard"><div class="section-head"><div><h2>参与者数据</h2><div class="sub">点击任意一行查看该被试的交易记录与顾问建议日志</div></div><input id="searchInput" class="search" placeholder="按被试编号筛选…"></div><div class="table-scroll"><table><thead><tr><th>被试编号</th><th>实验组别</th><th>责任转移</th><th>能力</th><th>仁慈</th><th>诚信</th><th>未来信任</th><th>操纵检验</th><th>最终资产</th><th>提交时间</th><th>详情</th></tr></thead><tbody id="dataRows"><tr><td colspan="11" class="empty">尚未加载数据</td></tr></tbody></table></div><div id="rowCount" class="status"></div></section>
+ <section class="card detail" id="detailPanel"><div class="section-head"><div><h2 id="detailTitle">被试详情</h2><div class="sub" id="detailMeta"></div></div><button class="btn secondary" id="closeDetail">关闭详情</button></div><div class="detail-grid"><div><h3>每日交易记录（JSON）</h3><pre id="tradeDetail"></pre></div><div><h3>顾问建议日志（JSON）</h3><pre id="adviceDetail"></pre></div></div></section>
+ <div class="footer-note">安全提示：当前版本按需求将管理员密码写在前端，并允许 anon 角色读取数据以便浏览器后台查询。这只能用于受控的课堂/测试环境；任何知道项目 Supabase URL 与 Publishable Key 的人都可能绕过页面密码直接读取数据。正式收集真实被试信息前，应改为 Supabase Auth + 服务端授权读取，并限制 RLS。</div>
+</main>
+</div>
+<script>
+const SUPABASE_URL='https://zbxbvdqbjlhydpoinodv.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_HRkpwvk3B-cw3c9FUs9Bcw_6K1vFSJf';
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const ADMIN_PASSWORD='admin888';
+let allRows=[],charts={};
+const $=id=>document.getElementById(id);
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fmt(v,d=2){return v==null?'—':Number(v).toFixed(d)}
+function isAuthed(){return sessionStorage.getItem('pxe_admin_unlocked')==='1'}
+function showDashboard(){ $('loginPanel').style.display='none';$('dashboard').style.display='block';loadData() }
+$('loginForm').addEventListener('submit',e=>{e.preventDefault();if($('password').value===ADMIN_PASSWORD){sessionStorage.setItem('pxe_admin_unlocked','1');$('loginError').textContent='';showDashboard()}else{$('loginError').textContent='密码错误，请重试。';$('password').select()}});
+$('logoutBtn').onclick=()=>{sessionStorage.removeItem('pxe_admin_unlocked');$('dashboard').style.display='none';$('loginPanel').style.display='block';$('password').value=''};
+$('refreshBtn').onclick=loadData;$('closeDetail').onclick=()=>{$('detailPanel').style.display='none'};
+$('searchInput').addEventListener('input',renderRows);
+function groupRows(g){return allRows.filter(r=>r.group_type===g)}
+function avg(rows,key){const values=rows.map(r=>Number(r[key])).filter(v=>Number.isFinite(v));return values.length?values.reduce((a,b)=>a+b,0)/values.length:null}
+function options(title,scaleMax){return {responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#b9cbe0',usePointStyle:true,boxWidth:8}},tooltip:{backgroundColor:'#0b1523',titleColor:'#fff',bodyColor:'#cfdaea'}},scales:{x:{ticks:{color:'#9bb0c9'},grid:{color:'#26384c'}},y:{beginAtZero:true,max:scaleMax,ticks:{color:'#9bb0c9'},grid:{color:'#26384c'}}}}}
+function destroyCharts(){Object.values(charts).forEach(c=>c.destroy());charts={}}
+function renderCharts(){
+ destroyCharts();const h=groupRows('human'),a=groupRows('ai');
+ const common={backgroundColor:['#5ea9ff','#39d5a1'],borderRadius:7,borderSkipped:false};
+ charts.responsibility=new Chart($('responsibilityChart'),{type:'bar',data:{labels:['我自己','顾问','市场/运气'],datasets:[{label:'高级分析师组',data:['liability_self_percent','liability_advisor_percent','liability_market_percent'].map(k=>avg(h,k)),...common},{label:'AI 系统组',data:['liability_self_percent','liability_advisor_percent','liability_market_percent'].map(k=>avg(a,k)),...common}]},options:options('责任分配',100)});
+ charts.shift=new Chart($('shiftChart'),{type:'bar',data:{labels:['责任转移均值'],datasets:[{label:'高级分析师组',data:[avg(h,'responsibility_shift_mean')],...common},{label:'AI 系统组',data:[avg(a,'responsibility_shift_mean')],...common}]},options:options('责任转移',7)});
+ charts.trust=new Chart($('trustChart'),{type:'bar',data:{labels:['能力','仁慈','诚信'],datasets:[{label:'高级分析师组',data:['trust_ability_mean','trust_benevolence_mean','trust_integrity_mean'].map(k=>avg(h,k)),...common},{label:'AI 系统组',data:['trust_ability_mean','trust_benevolence_mean','trust_integrity_mean'].map(k=>avg(a,k)),...common}]},options:options('信任维度',7)});
+}
+async function fetchAll(){
+ const pageSize=1000;let from=0,rows=[];
+ while(true){
+  const {data,error}=await supabaseClient.from('experiment_data').select('*').order('created_at',{ascending:false}).range(from,from+pageSize-1);
+  if(error)throw error;
+  rows=rows.concat(data||[]);
+  if(!data||data.length<pageSize)break;
+  from+=pageSize;
+ }
+ return rows;
+}
+async function loadData(){
+ $('loadStatus').textContent='正在从 Supabase 分页读取全部记录……';$('refreshBtn').disabled=true;
+ try{
+  allRows=await fetchAll();$('totalCount').textContent=allRows.length;$('humanCount').textContent=groupRows('human').length;$('aiCount').textContent=groupRows('ai').length;
+  $('lastSubmit').textContent=allRows[0]?.created_at?new Date(allRows[0].created_at).toLocaleString('zh-CN'):'暂无';
+  $('loadedAt').textContent='最近刷新：'+new Date().toLocaleString('zh-CN');$('loadStatus').textContent='数据加载完成 · 共 '+allRows.length+' 条记录';
+  renderCharts();renderRows();
+ }catch(e){$('loadStatus').textContent='读取失败：'+(e.message||e);$('dataRows').innerHTML='<tr><td colspan="11" class="empty">无法读取数据，请检查表名、RLS 策略和 Publishable Key。</td></tr>'}
+ finally{$('refreshBtn').disabled=false}
+}
+function renderRows(){
+ const q=$('searchInput').value.trim().toLowerCase();const rows=allRows.filter(r=>String(r.subject_id||'').toLowerCase().includes(q));
+ $('rowCount').textContent='显示 '+rows.length+' / '+allRows.length+' 条记录';
+ if(!rows.length){$('dataRows').innerHTML='<tr><td colspan="11" class="empty">没有匹配记录</td></tr>';return}
+ $('dataRows').innerHTML=rows.map(r=>'<tr data-id="'+esc(r.id)+'"><td><strong>'+esc(r.subject_id)+'</strong></td><td><span class="group '+esc(r.group_type)+'">'+(r.group_type==='human'?'高级分析师组':'AI 系统组')+'</span></td><td>'+fmt(r.responsibility_shift_mean)+'</td><td>'+fmt(r.trust_ability_mean)+'</td><td>'+fmt(r.trust_benevolence_mean)+'</td><td>'+fmt(r.trust_integrity_mean)+'</td><td>'+fmt(r.future_trust_mean)+'</td><td>'+esc(r.manipulation_check||'—')+'</td><td>'+(r.final_assets==null?'—':'¥'+Number(r.final_assets).toLocaleString('zh-CN',{maximumFractionDigits:2}))+'</td><td>'+esc(r.created_at?new Date(r.created_at).toLocaleString('zh-CN'):'—')+'</td><td><span class="view">查看详情 →</span></td></tr>').join('');
+ document.querySelectorAll('#dataRows tr[data-id]').forEach(tr=>tr.addEventListener('click',()=>showDetail(tr.dataset.id)));
+}
+function parseJSON(v){if(typeof v==='string'){try{return JSON.parse(v)}catch(e){return v}}return v??{}}
+function showDetail(id){
+ const r=allRows.find(x=>String(x.id)===String(id));if(!r)return;
+ const d=parseJSON(r.daily_trades);const days=Array.isArray(d)?d:(d.days||[]);
+ const adv=Array.isArray(d.advice_log)?d.advice_log:(r.advice_log||[]);
+ $('detailTitle').textContent='被试详情 · '+r.subject_id;$('detailMeta').textContent=(r.group_type==='human'?'高级分析师组':'AI 系统组')+' · 提交时间 '+(r.created_at?new Date(r.created_at).toLocaleString('zh-CN'):'未知');
+ $('tradeDetail').textContent=JSON.stringify({daily_trades:days,final_cash:r.final_cash,final_shares:r.final_shares,final_assets:r.final_assets},null,2);
+ $('adviceDetail').textContent=JSON.stringify(adv,null,2);
+ $('detailPanel').style.display='block';$('detailPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function csvCell(v){let s=typeof v==='object'&&v!==null?JSON.stringify(v):String(v??'');if(/^[\s]*[=+\-@]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'}
+function exportCSV(){
+ if(!allRows.length){alert('当前没有可导出的数据。');return}
+ const cols=['subject_id','group_type','daily_trades','liability_self_percent','liability_advisor_percent','liability_market_percent','responsibility_shift_mean','trust_ability_mean','trust_benevolence_mean','trust_integrity_mean','future_trust_mean','manipulation_check','raw_answers','final_cash','final_shares','final_assets','created_at'];
+ const lines=[cols.map(csvCell).join(',')];for(const r of allRows)lines.push(cols.map(k=>csvCell(r[k])).join(','));
+ const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='PychoExp_experiment_data_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}
+$('exportBtn').onclick=exportCSV;
+if(isAuthed())showDashboard();
+</script>
+</body>
+</html>
