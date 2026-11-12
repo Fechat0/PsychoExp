@@ -169,9 +169,47 @@ function fallbackConversationalReply(group: GroupType, day: number, question: st
   ].join("\n");
 }
 
+
+function safeKeyEquals(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+function isAuthorizedPublishableKey(request: Request): boolean {
+  const supplied = request.headers.get("apikey") ?? "";
+  if (!supplied) return false;
+
+  const candidates = new Set<string>();
+  const rawPublishableKeys = Deno.env.get("SUPABASE_PUBLISHABLE_KEYS");
+  if (rawPublishableKeys) {
+    try {
+      const parsed = JSON.parse(rawPublishableKeys) as Record<string, unknown>;
+      for (const value of Object.values(parsed)) {
+        if (typeof value === "string" && value.length > 0) candidates.add(value);
+      }
+    } catch (_error) {
+      // Fail closed if the platform-provided key map is malformed.
+    }
+  }
+
+  // Compatibility for projects still exposing the legacy anon key.
+  const legacyAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
+  if (legacyAnonKey) candidates.add(legacyAnonKey);
+
+  for (const expected of candidates) {
+    if (safeKeyEquals(supplied, expected)) return true;
+  }
+  return false;
+}
+
 Deno.serve(async (request: Request) => {
   if (request.method === "OPTIONS") return new Response("ok", { status: 200, headers: corsHeaders });
   if (request.method !== "POST") return jsonResponse(405, { ok: false, error: "Method not allowed" });
+  if (!isAuthorizedPublishableKey(request)) {
+    return jsonResponse(401, { ok: false, error: "A valid project publishable API key is required in the apikey header." });
+  }
 
   try {
     const body = await request.json();
