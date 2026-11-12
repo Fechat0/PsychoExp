@@ -366,8 +366,15 @@ function fallbackChatReply(question){
   const follow=['你的问题我明白。今天盘面变化比较快，建议先看量能和关键支撑位，不要只凭一条消息追涨。','结合今天的剧本，我的判断是：'+s.human,'执行上还是分批、留有余地，任何情况下都不能把模拟情境当成稳赚信号。'];
   return follow.join('');
  }
- return '【01 问题识别】已接收你的提问：“'+String(question).slice(0,46)+'”\\n【02 市场状态】'+s.trend+'；模拟最新价格 '+MARKET[state.day_index].price.toFixed(2)+' 元；账户资产 '+asset().toFixed(2)+' 元。\\n【03 风险参数】按预设情境评估波动与仓位集中度。','【04 策略结论】'+s.ai+'\\n【05 执行纪律】严格控制风险，结论仅适用于本实验模拟剧本。'].join('\\n');
+ return [
+  '【01 问题识别】已接收你的提问：“'+String(question).slice(0,46)+'”',
+  '【02 市场状态】'+s.trend+'；模拟最新价格 '+MARKET[state.day_index].price.toFixed(2)+' 元；账户资产 '+asset().toFixed(2)+' 元。',
+  '【03 风险参数】按预设情境评估波动与仓位集中度。',
+  '【04 策略结论】'+s.ai,
+  '【05 执行纪律】严格控制风险，结论仅适用于本实验模拟剧本。'
+ ].join('\n');
 }
+
 async function requestChatReply(question){
  const day=state.day_index+1,s=CHAT_SCRIPT[day-1];
  const fallback=fallbackChatReply(question);
