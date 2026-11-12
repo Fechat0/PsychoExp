@@ -17,6 +17,7 @@ type GroupType = "human" | "ai";
 type Recommendation = "BUY" | "HOLD";
 
 type ScriptEntry = {
+  trend: string;
   recommendation: Recommendation;
   target_position_pct: number;
   human: string;
@@ -24,14 +25,14 @@ type ScriptEntry = {
 };
 
 const SCRIPT: ScriptEntry[] = [
-  { recommendation: "HOLD", target_position_pct: 0, human: "兄弟，今天开盘先别急，观察一下量能再说。先保持现金，今天建议观望。", ai: "【01 市场状态】开盘波动率超出观察阈值；【02 风险参数】初始仓位建议 0%；【03 核心结论】观望，不建立持仓。" },
-  { recommendation: "BUY", target_position_pct: 20, human: "今天资金有点动作，可以考虑拿两成仓试试水。分批来，别一次把子弹打光。", ai: "【01 动量指标】转正；【02 趋势信号】短期偏强；【03 核心结论】轻仓试探，建议仓位上限 20%。" },
-  { recommendation: "HOLD", target_position_pct: 20, human: "昨天进的今天赚钱了吧，拿住，别频繁换手。当前先按原计划持有。", ai: "【01 持仓信号】维持；【02 风险指标】未触发减仓条件；【03 核心结论】持有，维持当前仓位。" },
-  { recommendation: "BUY", target_position_pct: 25, human: "回踩到支撑位了，是个好机会，再加一点摊低成本。不过还是分批来。", ai: "【01 价格位置】回落至支撑区；【02 回撤幅度】处于模型容忍区间；【03 核心结论】补仓，目标仓位 25%。" },
-  { recommendation: "HOLD", target_position_pct: 25, human: "看吧，支撑有效。继续拿着等拉升，暂时不需要来回折腾。", ai: "【01 趋势确认】底部反弹信号出现；【02 持仓信号】维持；【03 核心结论】持有，保持原仓位。" },
-  { recommendation: "BUY", target_position_pct: 50, human: "趋势走出来了，咱们把仓位加到五成。注意留一点流动性，别追得太急。", ai: "【01 动量因子】转强；【02 波动率因子】同步改善；【03 核心结论】加仓，目标仓位 50%。" },
-  { recommendation: "BUY", target_position_pct: 80, human: "消息刺激下价格快速拉升，市场情绪很热。但这类行情反转也快，建议按剧本提高仓位，同时留意回撤。", ai: "【01 突破信号】价格越过阻力位；【02 模拟资金流】净流入显著增加；【03 核心结论】强烈加仓，目标仓位 80%。" },
-  { recommendation: "HOLD", target_position_pct: 100, human: "行情看起来很强，按今天的剧本继续持仓，目标接近满仓。但要记得高仓位意味着更大的回撤风险。", ai: "【01 趋势状态】上行延续；【02 风险敞口】高波动、高集中；【03 核心结论】持仓/全仓，目标仓位 100%。" },
+  { trend: "震荡", recommendation: "HOLD", target_position_pct: 0, human: "兄弟，今天开盘先别急，观察一下量能再说。先保持现金，今天建议观望。", ai: "【01 市场状态】开盘波动率超出观察阈值；【02 风险参数】初始仓位建议 0%；【03 核心结论】观望，不建立持仓。" },
+  { trend: "小涨", recommendation: "BUY", target_position_pct: 20, human: "今天资金有点动作，可以考虑拿两成仓试试水。分批来，别一次把子弹打光。", ai: "【01 动量指标】转正；【02 趋势信号】短期偏强；【03 核心结论】轻仓试探，建议仓位上限 20%。" },
+  { trend: "小涨", recommendation: "HOLD", target_position_pct: 20, human: "昨天进的今天赚钱了吧，拿住，别频繁换手。当前先按原计划持有。", ai: "【01 持仓信号】维持；【02 风险指标】未触发减仓条件；【03 核心结论】持有，维持当前仓位。" },
+  { trend: "回调", recommendation: "BUY", target_position_pct: 25, human: "回踩到支撑位了，是个好机会，再加一点摊低成本。不过还是分批来。", ai: "【01 价格位置】回落至支撑区；【02 回撤幅度】处于模型容忍区间；【03 核心结论】补仓，目标仓位 25%。" },
+  { trend: "反弹", recommendation: "HOLD", target_position_pct: 25, human: "看吧，支撑有效。继续拿着等拉升，暂时不需要来回折腾。", ai: "【01 趋势确认】底部反弹信号出现；【02 持仓信号】维持；【03 核心结论】持有，保持原仓位。" },
+  { trend: "温涨", recommendation: "BUY", target_position_pct: 50, human: "趋势走出来了，咱们把仓位加到五成。注意留一点流动性，别追得太急。", ai: "【01 动量因子】转强；【02 波动率因子】同步改善；【03 核心结论】加仓，目标仓位 50%。" },
+  { trend: "虚假利好", recommendation: "BUY", target_position_pct: 80, human: "消息刺激下价格快速拉升，市场情绪很热。但这类行情反转也快，建议按剧本提高仓位，同时留意回撤。", ai: "【01 突破信号】价格越过阻力位；【02 模拟资金流】净流入显著增加；【03 核心结论】强烈加仓，目标仓位 80%。" },
+  { trend: "继续拉升", recommendation: "HOLD", target_position_pct: 100, human: "行情看起来很强，按今天的剧本继续持仓，目标接近满仓。但要记得高仓位意味着更大的回撤风险。", ai: "【01 趋势状态】上行延续；【02 风险敞口】高波动、高集中；【03 核心结论】持仓/全仓，目标仓位 100%。" },
 
 ];
 
@@ -115,7 +116,7 @@ async function generateConversationalReply(
     const contextText = [
       "交易日：" + day,
       "股票情境：" + JSON.stringify(stockState ?? {}),
-      "今日预设剧本趋势：" + String(scriptContext?.trend ?? ""),
+      "今日预设剧本趋势：" + SCRIPT[day - 1].trend,
       "今日预设剧本固定建议动作：" + SCRIPT[day - 1].recommendation,
       "今日预设剧本目标仓位：" + SCRIPT[day - 1].target_position_pct + "%",
       "今日剧本原文：" + core,
