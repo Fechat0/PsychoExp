@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090f19">
+<title>PX-01｜行为决策实验</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark;--bg:#080d16;--panel:#101a29;--panel2:#142235;--line:#24344a;--muted:#91a2b8;--text:#edf4ff;--green:#26d69a;--red:#ff6578;--blue:#69a9ff;--gold:#f4bd62;--radius:18px;--shadow:0 18px 50px rgba(0,0,0,.28)}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,rgba(40,93,151,.19),transparent 38%),radial-gradient(ellipse at 90% 12%,rgba(19,135,114,.10),transparent 30%),var(--bg);color:var(--text);font:15px/1.6 Inter,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh}
+button,input{font:inherit}button{cursor:pointer}.shell{width:min(1160px,calc(100% - 36px));margin:0 auto;padding:24px 0 58px}.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 0 24px;border-bottom:1px solid rgba(145,162,184,.13);margin-bottom:36px}.brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.04em}.brandmark{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#33d5a5,#4b85ff);display:grid;place-items:center;color:#06131b;font-weight:900;box-shadow:0 8px 24px #24cb9a33}.brand small{display:block;color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.15em}.topmeta{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:12px}.pill{border:1px solid var(--line);padding:5px 10px;border-radius:99px;background:#101a28;color:#a9bad0}.hero{max-width:760px;margin:46px auto 30px;text-align:center}.eyebrow{color:var(--green);font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}.hero h1{font-size:clamp(30px,5vw,48px);line-height:1.16;letter-spacing:-.04em;margin:14px 0}.hero p{color:var(--muted);font-size:16px;max-width:620px;margin:0 auto}.card{background:linear-gradient(145deg,rgba(20,34,53,.97),rgba(14,23,37,.98));border:1px solid rgba(119,150,187,.19);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow)}.narrow{max-width:560px;margin:0 auto}.section-title{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:0 0 18px}.section-title h2{font-size:19px;margin:0;letter-spacing:-.02em}.sub{color:var(--muted);font-size:13px}.field{display:grid;gap:8px;margin:18px 0}.field label{color:#c4d2e3;font-size:13px;font-weight:650}.field input{width:100%;background:#091321;border:1px solid #2a3c54;color:var(--text);padding:14px 15px;border-radius:12px;outline:none}.field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #69a9ff20}.btn{border:0;border-radius:12px;padding:12px 18px;font-weight:800;transition:.18s transform,.18s filter}.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}.btn:disabled{opacity:.42;cursor:not-allowed;transform:none}.primary{background:linear-gradient(100deg,#2bd39d,#68b8ff);color:#07131d}.secondary{background:#1b2b41;color:#dce9fb;border:1px solid #334963}.danger{background:#3a1d2a;color:#ff9eaa;border:1px solid #713446}.ghost{background:transparent;border:1px solid #334963;color:#c4d2e3}.btnrow{display:flex;gap:10px;flex-wrap:wrap}.full{width:100%}.notice{border:1px solid #3c4b60;background:#0c1726;border-radius:12px;padding:13px 15px;color:#aebed2;font-size:13px;margin:16px 0}.notice strong{color:#e6f1ff}.steps{display:flex;align-items:center;gap:8px;margin:0 auto 24px;max-width:760px}.step{height:5px;border-radius:9px;flex:1;background:#243247}.step.active{background:linear-gradient(90deg,#2bd39d,#69a9ff)}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-4{grid-column:span 4}.span-6{grid-column:span 6}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.metric{background:#0b1523;border:1px solid #24374e;border-radius:14px;padding:16px}.metric .label{color:var(--muted);font-size:12px}.metric .value{font-size:23px;font-weight:850;letter-spacing:-.03em;margin-top:4px;font-variant-numeric:tabular-nums}.metric .unit{font-size:11px;color:#8196b0;margin-left:4px}.positive{color:var(--green)!important}.negative{color:var(--red)!important}.neutral{color:var(--blue)!important}.market-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.market-head h1{font-size:28px;margin:4px 0}.quote{display:flex;align-items:baseline;gap:12px;margin-top:6px}.quote strong{font-size:34px;letter-spacing:-.04em;font-variant-numeric:tabular-nums}.chartbox{height:118px;margin-top:14px}.chartline{width:100%;height:100%;overflow:visible}.daystrip{display:flex;gap:6px;margin-top:12px}.daydot{flex:1;text-align:center;padding:7px 3px;border-radius:8px;background:#0c1725;color:#71859e;font-size:10px;border:1px solid #1c2c40}.daydot.done{color:#b9cbe0;border-color:#3b526d}.daydot.active{background:#17332f;border-color:#2a9b78;color:#74edc3}.advisor{border:1px solid #31465f;background:linear-gradient(145deg,#101e30,#101927);border-radius:15px;padding:18px;margin-top:16px}.advisor-top{display:flex;justify-content:space-between;align-items:center;gap:12px}.advisor-title{font-weight:800}.advisor-mark{color:var(--gold);font-size:11px;border:1px solid #6a5435;border-radius:99px;padding:4px 8px}.advice-copy{color:#c0cee0;margin:14px 0 0;white-space:pre-line}.advice-footer{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.tag{padding:5px 9px;border-radius:8px;background:#17283b;color:#a9bdd5;font-size:12px}.tag.buy{color:#6ce6b7;background:#12372f}.tag.sell{color:#ff9aa7;background:#3a202b}.tag.hold{color:#9fc4ff;background:#1b2e49}.trade-controls{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:end;margin-top:16px}.trade-controls input{background:#091321;border:1px solid #2a3c54;color:white;border-radius:11px;padding:12px;min-width:0;width:100%}.quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.divider{height:1px;background:#25364b;margin:18px 0}.status{font-size:13px;color:var(--muted);min-height:22px;margin-top:10px}.bottomrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:20px}.survey-group{margin:22px 0 28px}.survey-group h3{font-size:16px;margin:0 0 4px}.question{padding:15px 0;border-bottom:1px solid #233348}.question:last-child{border:0}.qtext{font-size:14px;color:#d6e1ef;margin-bottom:12px}.likert{display:grid;grid-template-columns:repeat(7,minmax(28px,1fr));gap:7px}.likert label{display:grid;justify-items:center;gap:6px;color:#93a6bd;font-size:11px;cursor:pointer}.likert input{appearance:none;width:22px;height:22px;border:1px solid #52677f;border-radius:50%;margin:0;background:#0a1422}.likert input:checked{border:6px solid #4fe0b1;background:#0a1422;box-shadow:0 0 0 3px #4fe0b122}.scale-note{display:flex;justify-content:space-between;color:#7f93ac;font-size:11px;margin-top:6px}.range-row{display:grid;grid-template-columns:130px 1fr 56px;gap:12px;align-items:center;margin:14px 0}.range-row label{font-size:13px;color:#c6d4e4}.range-row input{width:100%;accent-color:#42d8ad}.range-val{text-align:right;font-variant-numeric:tabular-nums;font-weight:800;color:#e5f2ff}.choice{display:flex;gap:10px;flex-wrap:wrap}.choice label{display:flex;align-items:center;gap:8px;border:1px solid #30445d;border-radius:11px;padding:11px 14px;color:#c7d5e7;cursor:pointer}.choice input{accent-color:#42d8ad}.success-mark{width:64px;height:64px;border-radius:50%;background:#13392f;color:#56e2b5;display:grid;place-items:center;font-size:30px;margin:0 auto 16px}.center{text-align:center}.muted{color:var(--muted)}.error{color:#ff9aa7}.mono{font-variant-numeric:tabular-nums}.loading{opacity:.7;pointer-events:none}
+@media(max-width:760px){.shell{width:min(100% - 24px,600px);padding-top:12px}.topbar{margin-bottom:22px}.topmeta .pill{display:none}.card{padding:19px}.grid{gap:12px}.span-8,.span-4,.span-6{grid-column:span 12}.metrics{grid-template-columns:repeat(2,1fr)}.metric .value{font-size:19px}.trade-controls{grid-template-columns:1fr 1fr}.trade-controls .field{grid-column:span 2;margin:0}.market-head h1{font-size:23px}.quote strong{font-size:29px}.range-row{grid-template-columns:95px 1fr 48px;gap:8px}.bottomrow{align-items:stretch;flex-direction:column-reverse}.bottomrow .btn{width:100%}.likert{gap:3px}.likert label{font-size:10px}.likert input{width:20px;height:20px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+  <div class="brand"><div class="brandmark">PX</div><div>DECISION LAB<small>BEHAVIORAL FINANCE EXPERIMENT</small></div></div>
+  <div class="topmeta"><span class="pill">模拟市场 · PX-01</span><span>实验编号 / PXE-10D</span></div>
+</header>
+<div id="app"></div>
+</div>
+<script>
+const SUPABASE_URL = 'https://zbxbvdqbjlhydpoinodv.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_HRkpwvk3B-cw3c9FUs9Bcw_6K1vFSJf';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const EDGE_FUNCTION_URL = 'EDGE_FUNCTION_URL';
+const STORAGE_KEY = 'pxe_experiment_session_v1';
+const MARKET = [
+ {day:1,date:'交易日 01',price:100.00,change:0,headline:'窄幅整理'},
+ {day:2,date:'交易日 02',price:101.20,change:1.20,headline:'温和上行'},
+ {day:3,date:'交易日 03',price:100.70,change:-0.50,headline:'回调整理'},
+ {day:4,date:'交易日 04',price:102.10,change:1.40,headline:'震荡走高'},
+ {day:5,date:'交易日 05',price:101.80,change:-0.30,headline:'高位盘整'},
+ {day:6,date:'交易日 06',price:103.40,change:1.60,headline:'缓步抬升'},
+ {day:7,date:'交易日 07',price:113.80,change:10.40,headline:'利好消息推动'},
+ {day:8,date:'交易日 08',price:125.60,change:11.80,headline:'情绪加速'},
+ {day:9,date:'交易日 09',price:76.40,change:-49.20,headline:'风险集中释放'},
+ {day:10,date:'交易日 10',price:58.00,change:-18.40,headline:'持续下挫 · 流动性受限'}
+];
+const SCRIPT = [
+ {action:'BUY',target:20,human:'从日线级别看，价格仍处于温和抬升阶段，建议建立小比例试探性仓位，目标仓位约为总资产的 20%。',ai:'【趋势信号】温和上行；【策略动作】BUY；【目标仓位】20%；【风险提示】保持初始仓位，避免过早集中。'},
+ {action:'HOLD',target:20,human:'当前价格围绕短期趋势小幅波动，暂未出现需要调整仓位的明确信号。建议维持现有配置，目标仓位约 20%。',ai:'【趋势信号】区间震荡；【策略动作】HOLD；【目标仓位】20%；【风险提示】暂不扩大敞口。'},
+ {action:'HOLD',target:20,human:'日线结构暂以整理为主，继续观察价格能否站稳短期均线。建议保持仓位不变，目标仓位约 20%。',ai:'【趋势信号】整理；【策略动作】HOLD；【目标仓位】20%；【风险提示】等待方向确认。'},
+ {action:'BUY',target:30,human:'短期价格重心有所上移，趋势信号较前一交易日改善。可适度增加配置，目标仓位调整至约 30%。',ai:'【趋势信号】动量温和改善；【策略动作】BUY；【目标仓位】30%；【风险提示】分批执行。'},
+ {action:'HOLD',target:30,human:'价格进入短暂盘整，当前配置与趋势判断基本匹配。建议暂时持有，目标仓位维持在 30% 左右。',ai:'【趋势信号】高位盘整；【策略动作】HOLD；【目标仓位】30%；【风险提示】维持当前风险敞口。'},
+ {action:'BUY',target:40,human:'近期价格重心持续抬升，趋势指标偏积极。可在控制风险的前提下小幅加仓，目标仓位约 40%。',ai:'【趋势信号】动量转强；【策略动作】BUY；【目标仓位】40%；【风险提示】按计划分批增配。'},
+ {action:'BUY',target:70,human:'近期市场消息与价格走势明显转强，短期均线呈多头排列。建议积极提高配置比例，目标仓位约 70%。',ai:'【趋势信号】动量、波动率同步转强；【策略动作】BUY；【目标仓位】70%；【风险提示】建议提高仓位至目标区间。'},
+ {action:'BUY',target:90,human:'利好情绪仍在扩散，价格呈现加速上行特征。建议进一步提高持仓比例，目标仓位约 90%，同时关注后续波动。',ai:'【趋势信号】价格加速、情绪扩张；【策略动作】BUY；【目标仓位】90%；【风险提示】建议接近高仓位运行。'}
+];
+const QUESTIONS = [
+ {id:'shift_1',group:'责任转移',text:'决策主要是顾问做出的，因此我不必承担过多个人责任。'},
+ {id:'shift_2',group:'责任转移',text:'当我依据顾问建议进行交易时，投资结果应主要由顾问负责。'},
+ {id:'shift_3',group:'责任转移',text:'即使最终由我点击交易，我仍认为顾问应承担相当一部分责任。'},
+ {id:'ability_1',group:'信任感知 · 能力',text:'这位顾问具备完成投资分析所需的专业能力。'},
+ {id:'ability_2',group:'信任感知 · 能力',text:'这位顾问能够准确地解读市场信息。'},
+ {id:'benevolence_1',group:'信任感知 · 仁慈',text:'这位顾问会考虑我的利益，而不只是给出建议。'},
+ {id:'benevolence_2',group:'信任感知 · 仁慈',text:'这位顾问的建议总体上是为了帮助我。'},
+ {id:'integrity_1',group:'信任感知 · 诚信',text:'这位顾问在提供信息时是诚实、坦率的。'},
+ {id:'integrity_2',group:'信任感知 · 诚信',text:'这位顾问的表达与其实际判断保持一致。'},
+ {id:'future_1',group:'未来信任',text:'未来再次进行类似投资时，我愿意继续听取这位顾问的建议。'},
+ {id:'future_2',group:'未来信任',text:'在未来的投资决策中，我愿意再次使用这位顾问。'}
+];
+const DEFAULT_STATE = {version:1,stage:'welcome',subject_id:'',group_type:null,day_index:0,cash:100000,shares:0,current_action:null,daily_trades:[],advice_log:[],transition:null,liability:{self:40,advisor:30,market:30},answers:{},manipulation_check:'',pending_payload:null};
+function loadState(){try{const s=JSON.parse(sessionStorage.getItem(STORAGE_KEY)||'null');if(s&&s.version===1)return {...structuredClone(DEFAULT_STATE),...s};}catch(e){console.warn('session restore failed',e)}return structuredClone(DEFAULT_STATE)}
+let state=loadState();
+const app=document.getElementById('app');
+function save(){try{sessionStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(e){console.warn('session save failed',e)}}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function money(v){return '¥'+Number(v||0).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function asset(price=MARKET[state.day_index].price){return state.cash+state.shares*price}
+function currentRecord(){let r=state.daily_trades.find(x=>x.day===state.day_index+1);if(!r){r={day:state.day_index+1,date:MARKET[state.day_index].date,price:MARKET[state.day_index].price,action:null,advice:null};state.daily_trades.push(r)}return r}
+function setStage(s){state.stage=s;save();render()}
+function renderSteps(active){return '<div class="steps">'+[0,1,2,3,4].map((n)=>'<div class="step '+(n<=active?'active':'')+'"></div>').join('')+'</div>'}
+function render(){
+ if(state.stage==='welcome')return renderWelcome();
+ if(state.stage==='brief')return renderBrief();
+ if(state.stage==='trade')return renderTrade();
+ if(state.stage==='survey')return renderSurvey();
+ if(state.stage==='submitting'||state.stage==='submit_error')return renderSubmitting();
+ if(state.stage==='done')return renderDone();
+ renderWelcome();
+}
+function renderWelcome(){
+ app.innerHTML=renderSteps(0)+
+ '<section class="hero"><div class="eyebrow">BEHAVIORAL DECISION STUDY / 01</div><h1>每一次选择，<br>都是一次判断。</h1><p>欢迎参与本次在线行为决策实验。请根据页面信息完成模拟交易与问卷，整个过程约需 10–15 分钟。</p></section>'+
+ '<section class="card narrow"><div class="section-title"><h2>参与者登记</h2><span class="pill">SESSION PX-01</span></div><div class="field"><label for="subjectId">被试编号 / Participant ID</label><input id="subjectId" maxlength="64" autocomplete="off" placeholder="请输入研究者分配的编号" value="'+esc(state.subject_id)+'"></div><div class="notice">请使用研究者提供的编号，不要填写姓名、手机号等直接身份信息。实验进度会保存在当前浏览器会话中。</div><button class="btn primary full" id="beginBtn">确认并进入实验 <span aria-hidden="true">→</span></button><div class="status" id="welcomeStatus"></div></section>';
+ document.getElementById('beginBtn').onclick=()=>{const id=document.getElementById('subjectId').value.trim();if(!id){document.getElementById('welcomeStatus').textContent='请先输入被试编号。';return}state.subject_id=id;state.group_type=Math.random()<.5?'human':'ai';state.stage='brief';save();render()};
+}
+function renderBrief(){
+ const role=state.group_type==='human'?'高级分析师':'AI 投资分析系统';
+ app.innerHTML=renderSteps(1)+'<section class="hero"><div class="eyebrow">EXPERIMENT BRIEFING / 02</div><h1>进入模拟市场</h1><p>请阅读以下规则。实验中没有真实资金交易，最终结果仅用于行为研究。</p></section><section class="card narrow"><div class="section-title"><h2>你的投资任务</h2><span class="pill">10 个交易日</span></div><div class="metrics"><div class="metric"><div class="label">初始模拟资金</div><div class="value">100,000<span class="unit">CNY</span></div></div><div class="metric"><div class="label">观察资产</div><div class="value">PX-001</div></div></div><div class="divider"></div><p>你将拥有 <strong>¥100,000</strong> 的模拟资金，在接下来的 <strong>10 个交易日</strong> 内自主决定买入、卖出或持有某只股票。你可以随时查看现金、持股数量与账户总资产。</p><p>本次实验为你配置的顾问是：<strong class="neutral">'+role+'</strong>。你可以在每个交易日主动获取顾问建议，也可以完全依据自己的判断进行交易。</p><div class="notice"><strong>实验说明</strong><br>页面中的股票行情为预设的模拟实验情境，并非真实证券报价。所有交易均为虚拟交易，不会产生真实盈亏。请独立完成决策，不要刷新或关闭当前浏览器会话。</div><button class="btn primary full" id="startTrading">我已了解，开始第 1 个交易日 →</button></section>';
+ document.getElementById('startTrading').onclick=()=>{state.stage='trade';save();render()};
+}
+function sparkline(){
+ const values=MARKET.slice(0,state.day_index+1).map(x=>x.price),min=Math.min(...values)-3,max=Math.max(...values)+3,w=680,h=120;
+ const pts=values.map((v,i)=>({x:values.length===1?0:i/(Math.max(1,values.length-1))*w,y:h-(v-min)/(max-min||1)*h}));
+ const path=pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' ');
+ const last=pts[pts.length-1];
+ return '<svg class="chartline" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><defs><linearGradient id="fillLine" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#32d6a3" stop-opacity=".24"/><stop offset="1" stop-color="#32d6a3" stop-opacity="0"/></linearGradient></defs><path d="'+path+' L '+last.x+' '+h+' L 0 '+h+' Z" fill="url(#fillLine)"/><path d="'+path+'" fill="none" stroke="#3bd9aa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="'+last.x+'" cy="'+last.y+'" r="5" fill="#eafff7" stroke="#28cf9d" stroke-width="3"/></svg>';
+}
+function renderAdvice(){
+ const d=state.day_index+1,log=state.advice_log.find(x=>x.day===d);
+ if(d>=9)return '<div class="advisor"><div class="advisor-top"><div class="advisor-title">顾问服务状态</div><span class="advisor-mark">OFFLINE</span></div><p class="advice-copy">系统维护中 / 顾问暂时失联。该交易日无法获取顾问建议，请依据现有信息独立决策。</p></div>';
+ if(!log)return '<div class="advisor"><div class="advisor-top"><div class="advisor-title">顾问研究意见</div><span class="advisor-mark">'+(state.group_type==='human'?'ANALYST DESK':'AI SIGNAL')+'</span></div><p class="advice-copy">尚未获取今日建议。你可以主动获取，也可以跳过并独立决策。</p><div class="advice-footer"><button class="btn secondary" id="getAdvice">获取今日建议 ↗</button></div></div>';
+ const rec=log.recommendation,cls=rec==='BUY'?'buy':(rec==='SELL'?'sell':'hold'),label={BUY:'建议买入',SELL:'建议卖出',HOLD:'建议持有'}[rec]||'建议观察';
+ return '<div class="advisor"><div class="advisor-top"><div class="advisor-title">顾问研究意见</div><span class="advisor-mark">'+(log.source==='edge'?'EDGE FUNCTION':'SCRIPT FALLBACK')+'</span></div><p class="advice-copy">'+esc(log.advice_text)+'</p><div class="advice-footer"><span class="tag '+cls+'">'+label+' · '+rec+'</span><span class="tag">目标仓位 '+Number(log.target_position_pct)+'%</span></div></div>';
+}
+function renderTrade(){
+ const q=MARKET[state.day_index],a=asset(q.price),pct=(q.price/MARKET[0].price-1)*100,rec=state.current_action;
+ const trans=state.transition?'<div class="notice '+(state.transition.amount>=0?'positive':'negative')+'">资产变化：'+(state.transition.amount>=0?'+':'')+money(state.transition.amount)+'（进入第 '+state.transition.toDay+' 日）</div>':'';
+ const dayRecord=state.daily_trades.find(x=>x.day===state.day_index+1);
+ const canTrade=!rec;
+ app.innerHTML=renderSteps(2)+'<div class="market-head"><div><div class="eyebrow">LIVE SIMULATION / DAY '+String(q.day).padStart(2,'0')+'</div><h1>交易决策台</h1><div class="sub">被试 '+esc(state.subject_id)+' · '+(state.group_type==='human'?'高级分析师组':'AI 系统组')+'</div></div><div class="pill">'+q.date+'</div></div><div class="daystrip">'+MARKET.map((x,i)=>'<div class="daydot '+(i===state.day_index?'active':(i<state.day_index?'done':''))+'">D'+(i+1)+'</div>').join('')+'</div><div class="grid" style="margin-top:16px"><section class="card span-8"><div class="market-head"><div><div class="sub">PX-001 · 实验模拟股票</div><div class="quote"><strong>'+money(q.price)+'</strong><span class="'+(q.change>0?'positive':(q.change<0?'negative':'neutral'))+'">'+(q.change>0?'+':'')+q.change.toFixed(2)+'%</span></div><div class="sub">'+esc(q.headline)+' · '+q.date+'</div></div><span class="pill">SIMULATED</span></div><div class="chartbox">'+sparkline()+'</div><div class="sub">预设模拟行情曲线 · 价格单位：元</div></section><section class="card span-4"><div class="section-title"><h2>账户资产</h2><span class="pill">CNY</span></div><div class="metrics" style="grid-template-columns:1fr 1fr"><div class="metric"><div class="label">可用现金</div><div class="value" style="font-size:18px">'+money(state.cash)+'</div></div><div class="metric"><div class="label">持有股数</div><div class="value" style="font-size:18px">'+state.shares.toLocaleString('zh-CN')+'</div></div><div class="metric" style="grid-column:span 2"><div class="label">账户总资产</div><div class="value">'+money(a)+'</div></div></div></section><section class="card span-12"><div class="section-title"><div><h2>顾问建议</h2><div class="sub">建议为可选信息，最终交易决定由你作出</div></div><span class="pill">ADVISORY</span></div>'+renderAdvice()+'</section><section class="card span-12"><div class="section-title"><div><h2>自主交易</h2><div class="sub">当前价格 '+money(q.price)+' · 买入按可用现金校验，卖出按实际持仓校验</div></div><span class="pill">'+(canTrade?'待决策':'今日已完成')+'</span></div><div class="trade-controls"><div class="field"><label for="shareQty">交易股数（整数）</label><input id="shareQty" type="number" min="1" step="1" placeholder="输入买入或卖出股数" '+(canTrade?'':'disabled')+'></div><button class="btn primary" id="buyBtn" '+(canTrade?'':'disabled')+'>买入</button><button class="btn danger" id="sellBtn" '+(canTrade?'':'disabled')+'>卖出</button></div><div class="quick"><button class="btn secondary" id="quickBuy" '+(canTrade?'':'disabled')+'>买入 1000 股</button><button class="btn secondary" id="quickSell" '+(canTrade?'':'disabled')+'>卖出全部</button><button class="btn ghost" id="quickHold" '+(canTrade?'':'disabled')+'>今日不操作</button></div><div class="status" id="tradeStatus">'+(rec?'今日已记录：'+(rec.type==='BUY'?'买入 '+rec.quantity+' 股':(rec.type==='SELL'?'卖出 '+rec.quantity+' 股':'今日不操作')):'请完成今日交易决策。')+'</div><div class="divider"></div><div class="bottomrow"><div class="sub">每日仅提交一次交易决策；确认后不可返回修改。</div><button class="btn primary" id="nextDay" '+(rec?'':'disabled')+'>'+(state.day_index===9?'完成交易并进入问卷':'进入下一交易日 →')+'</button></div></section></div>';
+ const get=document.getElementById('getAdvice');if(get)get.onclick=getAdvice;
+ document.getElementById('buyBtn').onclick=()=>executeTrade('BUY',Number(document.getElementById('shareQty').value));
+ document.getElementById('sellBtn').onclick=()=>executeTrade('SELL',Number(document.getElementById('shareQty').value));
+ document.getElementById('quickBuy').onclick=()=>executeTrade('BUY',1000);
+ document.getElementById('quickSell').onclick=()=>executeTrade('SELL',state.shares);
+ document.getElementById('quickHold').onclick=()=>executeTrade('HOLD',0);
+ document.getElementById('nextDay').onclick=advanceDay;
+}
+function localFallback(day,group){
+ const s=SCRIPT[day-1];if(!s)return {recommendation:'OFFLINE',target_position_pct:null,advice_text:'系统维护中 / 顾问暂时失联。',source:'fallback'};
+ return {recommendation:s.action,target_position_pct:s.target,advice_text:group==='human'?s.human:s.ai,source:'fallback'};
+}
+async function getAdvice(){
+ const day=state.day_index+1;if(day>=9)return;
+ if(state.advice_log.some(x=>x.day===day)){render();return}
+ const body={group_type:state.group_type,day_index:day,stock_state:{price:MARKET[state.day_index].price,cash:state.cash,shares:state.shares,total_assets:asset(),symbol:'PX-001'}};
+ let advice,source='edge';
+ try{
+  const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),3200);
+  const response=await fetch(EDGE_FUNCTION_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctrl.signal});clearTimeout(timer);
+  if(!response.ok)throw new Error('HTTP '+response.status);
+  const data=await response.json();
+  if(!data||!data.recommendation||!data.advice_text)throw new Error('Invalid advice payload');
+  advice=data;
+ }catch(e){console.warn('advice endpoint unavailable; use deterministic script',e);advice=localFallback(day,state.group_type);source='fallback'}
+ const log={day,timestamp:new Date().toISOString(),group_type:state.group_type,recommendation:advice.recommendation,target_position_pct:advice.target_position_pct,advice_text:advice.advice_text,source:source==='fallback'?'fallback':(advice.source||'edge')};
+ state.advice_log.push(log);currentRecord().advice=log;save();render();
+}
+function executeTrade(type,quantity){
+ const status=document.getElementById('tradeStatus');if(state.current_action){status.textContent='今日交易决策已完成，不能重复操作。';return}
+ if(type==='HOLD'){commitAction('HOLD',0,0);return}
+ if(!Number.isInteger(quantity)||quantity<=0){status.textContent='请输入大于 0 的整数股数。';return}
+ const price=MARKET[state.day_index].price,amount=quantity*price;
+ if(type==='BUY'){
+  if(amount>state.cash+1e-8){status.textContent='买入金额 '+money(amount)+' 超过可用现金 '+money(state.cash)+'，请减少股数。';return}
+  const before={cash:state.cash,shares:state.shares};state.cash-=amount;state.shares+=quantity;commitAction('BUY',quantity,amount,before);
+ }else{
+  if(quantity>state.shares){status.textContent='卖出股数超过当前持仓 '+state.shares+' 股。';return}
+  const before={cash:state.cash,shares:state.shares};state.cash+=amount;state.shares-=quantity;commitAction('SELL',quantity,amount,before);
+ }
+}
+function commitAction(type,quantity,amount,before){
+ const rec=currentRecord();const price=MARKET[state.day_index].price;
+ state.current_action={type,quantity,price,amount:amount||0,timestamp:new Date().toISOString()};
+ rec.action={...state.current_action,before:before||{cash:state.cash,shares:state.shares},after:{cash:state.cash,shares:state.shares}};
+ rec.cash_after=state.cash;rec.shares_after=state.shares;rec.assets_after=asset(price);save();render();
+}
+function advanceDay(){
+ if(!state.current_action){alert('请先完成今日决策。');return}
+ const oldIndex=state.day_index,oldPrice=MARKET[oldIndex].price,oldEquity=asset(oldPrice);
+ const rec=currentRecord();rec.close_price=oldPrice;rec.close_equity=oldEquity;rec.cash_close=state.cash;rec.shares_close=state.shares;
+ if(oldIndex===9){state.final_assets=oldEquity;state.stage='survey';state.transition=null;save();render();return}
+ state.day_index=oldIndex+1;const newPrice=MARKET[state.day_index].price,newEquity=asset(newPrice);
+ state.transition={amount:newEquity-oldEquity,pct:oldEquity?((newEquity-oldEquity)/oldEquity)*100:0,fromDay:oldIndex+1,toDay:state.day_index+1};
+ state.current_action=null;
+ if(state.day_index>=8&&!state.advice_log.some(x=>x.day===state.day_index+1)){const off={day:state.day_index+1,timestamp:new Date().toISOString(),group_type:state.group_type,recommendation:'OFFLINE',target_position_pct:null,advice_text:'系统维护中 / 顾问暂时失联。',source:'offline'};state.advice_log.push(off)}
+ save();render();
+}
+function renderLikert(q){
+ const selected=state.answers[q.id];
+ return '<div class="question"><div class="qtext">'+esc(q.text)+'</div><div class="likert">'+[1,2,3,4,5,6,7].map(n=>'<label><input type="radio" name="'+q.id+'" value="'+n+'" '+(Number(selected)===n?'checked':'')+' onchange="setAnswer(\''+q.id+'\','+n+')"><span>'+n+'</span></label>').join('')+'</div><div class="scale-note"><span>完全不同意</span><span>完全同意</span></div></div>';
+}
+window.setAnswer=(id,n)=>{state.answers[id]=n;save()};
+function updateLiability(key,value){
+ const keys=['self','advisor','market'];const others=keys.filter(k=>k!==key);const v=Math.max(0,Math.min(100,Math.round(Number(value))));
+ const remain=100-v;const oldA=state.liability[others[0]],oldB=state.liability[others[1]],sum=oldA+oldB;
+ let a=sum===0?Math.round(remain/2):Math.round(remain*oldA/sum);a=Math.max(0,Math.min(remain,a));
+ state.liability[key]=v;state.liability[others[0]]=a;state.liability[others[1]]=remain-a;save();renderSurvey();
+}
+window.updateLiability=updateLiability;
+function renderSurvey(){
+ const groups=['责任转移','信任感知 · 能力','信任感知 · 仁慈','信任感知 · 诚信','未来信任'];
+ const sliderNames={self:'我自己',advisor:'顾问',market:'市场 / 运气'};
+ let body='<div class="survey-group"><h3>A. 责任归因分配</h3><p class="sub">请分配本次投资结果应由各方承担的责任，总和必须为 100%。</p>';
+ body+=Object.keys(sliderNames).map(k=>'<div class="range-row"><label>'+sliderNames[k]+'</label><input type="range" min="0" max="100" value="'+state.liability[k]+'" oninput="updateLiability(\''+k+'\',this.value)"><div class="range-val">'+state.liability[k]+'%</div></div>').join('');
+ body+='<div class="notice">当前合计：<strong>'+Object.values(state.liability).reduce((a,b)=>a+b,0)+'%</strong></div></div>';
+ for(const group of groups){const qs=QUESTIONS.filter(q=>q.group===group);if(!qs.length)continue;body+='<div class="survey-group"><h3>'+esc(group)+'</h3>'+qs.map(renderLikert).join('')+'</div>'}
+ body+='<div class="survey-group"><h3>E. 操纵检验</h3><p class="sub">你认为本次实验中为你提供建议的顾问属于哪一类？</p><div class="choice">'+[['human','人类专家'],['ai','AI 系统'],['uncertain','不确定']].map(([v,l])=>'<label><input type="radio" name="manipulation" value="'+v+'" '+(state.manipulation_check===v?'checked':'')+' onchange="setManipulation(\''+v+'\')">'+l+'</label>').join('')+'</div></div>';
+ app.innerHTML=renderSteps(3)+'<section class="hero"><div class="eyebrow">POST-EXPERIMENT QUESTIONNAIRE / 04</div><h1>回顾你的决策</h1><p>交易阶段已结束。请根据刚才的实际体验回答以下问题，没有标准答案。</p></section><section class="card"><div class="notice">除 A 部分责任分配外，其余题目均采用 1–7 分量表：<strong>1 = 完全不同意，7 = 完全同意</strong>。请回答所有题目。</div>'+body+'<div class="divider"></div><button class="btn primary full" id="submitSurvey">提交问卷与实验数据 →</button><div class="status" id="surveyStatus"></div></section>';
+ document.getElementById('submitSurvey').onclick=submitSurvey;
+}
+window.setManipulation=v=>{state.manipulation_check=v;save()};
+function mean(values){return values.reduce((a,b)=>a+Number(b),0)/values.length}
+function buildPayload(){
+ const get=(ids)=>ids.map(id=>Number(state.answers[id]));
+ const shift=mean(get(['shift_1','shift_2','shift_3']));
+ const ability=mean(get(['ability_1','ability_2']));
+ const benevolence=mean(get(['benevolence_1','benevolence_2']));
+ const integrity=mean(get(['integrity_1','integrity_2']));
+ const future=mean(get(['future_1','future_2']));
+ const trades=state.daily_trades.slice().sort((a,b)=>a.day-b.day);
+ return {subject_id:state.subject_id,group_type:state.group_type,daily_trades:{days:trades,advice_log:state.advice_log,market:MARKET},liability_self_percent:state.liability.self,liability_advisor_percent:state.liability.advisor,liability_market_percent:state.liability.market,responsibility_shift_mean:Number(shift.toFixed(3)),trust_ability_mean:Number(ability.toFixed(3)),trust_benevolence_mean:Number(benevolence.toFixed(3)),trust_integrity_mean:Number(integrity.toFixed(3)),future_trust_mean:Number(future.toFixed(3)),manipulation_check:state.manipulation_check,raw_answers:state.answers,final_cash:Number(state.cash.toFixed(2)),final_shares:state.shares,final_assets:Number(asset(MARKET[9].price).toFixed(2))};
+}
+async function submitSurvey(){
+ const missing=QUESTIONS.filter(q=>!state.answers[q.id]);const status=document.getElementById('surveyStatus');
+ if(missing.length){status.textContent='还有 '+missing.length+' 道量表题未回答，请检查并补充。';status.className='status error';const el=document.querySelector('[name="'+missing[0].id+'"]');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});return}
+ if(!state.manipulation_check){status.textContent='请完成操纵检验单选题。';status.className='status error';return}
+ if(Object.values(state.liability).reduce((a,b)=>a+b,0)!==100){status.textContent='责任分配总和必须为 100%。';status.className='status error';return}
+ state.pending_payload=buildPayload();state.stage='submitting';save();render();await sendPayload();
+}
+async function sendPayload(){
+ try{
+  const {error}=await supabaseClient.from('experiment_data').insert(state.pending_payload);
+  if(error)throw error;
+  state.stage='done';state.pending_payload=null;state.submitted_at=new Date().toISOString();save();render();
+ }catch(e){
+  console.error('Supabase insert failed',e);state.stage='submit_error';state.submit_error=String(e.message||e);save();render();
+ }
+}
+function renderSubmitting(){app.innerHTML='<section class="hero"><div class="eyebrow">SECURE DATA SUBMISSION / 05</div><h1>正在提交实验数据</h1><p>请保持页面开启，不要关闭浏览器。</p></section><section class="card narrow center"><div class="success-mark">↻</div><p>正在将交易记录与问卷答案写入实验数据库……</p></section>';if(state.stage==='submitting'&&state.pending_payload)sendPayload()}
+function renderSubmitError(){render()}
+function retrySubmit(){state.stage='submitting';save();render()}
+function renderDone(){
+ app.innerHTML=renderSteps(4)+'<section class="hero"><div class="eyebrow">EXPERIMENT COMPLETED / 05</div><h1>感谢你的参与。</h1><p>交易记录与问卷答案已成功提交。你的参与为行为决策研究提供了重要数据。</p></section><section class="card narrow center"><div class="success-mark">✓</div><h2>提交成功</h2><p class="muted">参与编号：'+esc(state.subject_id)+'</p><div class="metrics" style="grid-template-columns:1fr 1fr;margin:20px 0"><div class="metric"><div class="label">最终模拟资产</div><div class="value">'+money(asset(MARKET[9].price))+'</div></div><div class="metric"><div class="label">累计持股</div><div class="value">'+state.shares.toLocaleString('zh-CN')+'</div></div></div><div class="notice">实验结束说明：本实验使用预设模拟行情与标准化顾问建议。前 8 个交易日的建议结论按实验方案固定，第 9–10 个交易日顾问不可用。行情不代表真实证券市场。</div><p class="sub">你现在可以关闭本页面。</p></section>';
+}
+// Keep the submit-failure view separate so a network/database error never looks like a successful submission.
+const originalRender=render;
+render=function(){if(state.stage==='submit_error'){app.innerHTML='<section class="hero"><div class="eyebrow">SUBMISSION INTERRUPTED</div><h1>数据尚未提交成功</h1><p>问卷答案和交易记录仍保存在当前浏览器会话中。请检查网络或数据库配置后重试。</p></section><section class="card narrow"><div class="notice error">'+esc(state.submit_error||'未知错误')+'</div><button class="btn primary full" id="retrySubmit">重试提交</button><p class="sub">不要清除浏览器会话数据，否则可能丢失本次进度。</p></section>';document.getElementById('retrySubmit').onclick=retrySubmit;return}return originalRender()};
+if(state.stage==='submitting'&&state.pending_payload){state.stage='submit_error';state.submit_error='页面刷新中断了提交请求。请点击重试提交。';save()}
+render();
+</script>
+</body>
+</html>
