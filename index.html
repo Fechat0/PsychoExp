@@ -229,8 +229,9 @@ async function submitSurvey(){
 }
 async function sendPayload(){
  try{
-  const {error}=await supabaseClient.from('experiment_data').insert(state.pending_payload);
-  if(error)throw error;
+  const {data,error}=await supabaseClient.functions.invoke('submit-experiment',{body:state.pending_payload});
+  if(error)throw new Error(error.message||String(error));
+  if(!data||data.ok!==true)throw new Error(data?.error||'服务器未确认收到实验数据。');
   state.stage='done';state.pending_payload=null;state.submitted_at=new Date().toISOString();save();render();
  }catch(e){
   console.error('Supabase insert failed',e);state.stage='submit_error';state.submit_error=String(e.message||e);save();render();
