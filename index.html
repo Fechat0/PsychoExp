@@ -415,8 +415,11 @@ async function sendChatMessage(){
  const started=Date.now();
  const replyPromise=requestChatReply(question);
  if(state.group_type==='ai'){
-  await waitMs(Math.max(0,1500-(Date.now()-started)));
-  const reply=await replyPromise;
+  const earlyReply=await Promise.race([
+   replyPromise,
+   waitMs(Math.max(0,1500-(Date.now()-started))).then(()=>null)
+  ]);
+  const reply=earlyReply||{reply_text:fallbackChatReply(question),source:'fixed-delay-fallback'};
   chatTyping=false;
   const s=CHAT_SCRIPT[day-1];
   const formatted=reply.reply_text;
