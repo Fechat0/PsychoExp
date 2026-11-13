@@ -36,6 +36,70 @@ const SCRIPT: ScriptEntry[] = [
 
 ];
 
+let cachedDeepSeekKey: string | null = null;
+let cachedDeepSeekKeyAt = 0;
+
+function getSupabaseServerKey(): string | null {
+  const legacy = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (legacy) return legacy;
+
+  const raw = Deno.env.get("SUPABASE_SECRET_KEYS");
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    for (const value of Object.values(parsed)) {
+      if (typeof value !== "string" || !value) continue;
+      const resolved = Deno.env.get(value);
+      if (resolved?.startsWith("sb_secret_")) return resolved;
+      if (value.startsWith("sb_secret_")) return value;
+    }
+  } catch (_error) {
+    return null;
+  }
+  return null;
+}
+
+async function resolveLLMApiKey(): Promise<string | null> {
+  // An explicitly configured Edge Function secret takes precedence.
+  const direct = Deno.env.get("LLM_API_KEY");
+  if (direct) return direct;
+
+  // Otherwise use the encrypted Vault entry. The privileged key stays in
+  // Supabase's function environment and is never sent to the browser.
+  if (cachedDeepSeekKey && Date.now() - cachedDeepSeekKeyAt < 60_000) {
+    return cachedDeepSeekKey;
+  }
+  const projectUrl = Deno.env.get("SUPABASE_URL");
+  const serverKey = getSupabaseServerKey();
+  if (!projectUrl || !serverKey) return null;
+
+  try {
+    const headers: Record<string, string> = {
+      "apikey": serverKey,
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+    };
+    // Legacy service-role keys are JWTs. New sb_secret keys are API keys,
+    // not JWTs, so they must not be put in the Authorization header.
+    if (!serverKey.startsWith("sb_secret_")) {
+      headers["Authorization"] = "Bearer " + serverKey;
+    }
+    const response = await fetch(projectUrl + "/rest/v1/rpc/get_deepseek_api_key", {
+      method: "POST",
+      headers,
+      body: "{}",
+    });
+    if (!response.ok) return null;
+    const value = await response.json();
+    if (typeof value !== "string" || !value.trim()) return null;
+    cachedDeepSeekKey = value.trim();
+    cachedDeepSeekKeyAt = Date.now();
+    return cachedDeepSeekKey;
+  } catch (_error) {
+    return null;
+  }
+}
+
 function jsonResponse(status: number, payload: Record<string, unknown>) {
   return new Response(JSON.stringify(payload), { status, headers: corsHeaders });
 }
@@ -242,7 +306,7 @@ Deno.serve(async (request: Request) => {
       const history = Array.isArray(body?.conversation_history)
         ? body.conversation_history as Array<{ role: "user" | "assistant"; content: string }>
         : [];
-      const apiKey = Deno.env.get("LLM_API_KEY");
+      const apiKey = await resolveLLMApiKey();
       let replyText = fallbackConversationalReply(group, day, question, stockState);
       let source = "fallback";
       if (apiKey) {
@@ -273,7 +337,7 @@ Deno.serve(async (request: Request) => {
     const entry = SCRIPT[day - 1];
     let adviceText = group === "human" ? entry.human : entry.ai;
     let source = "script";
-    const apiKey = Deno.env.get("LLM_API_KEY");
+    const apiKey = await resolveLLMApiKey();
     if (apiKey) {
       const polished = await polishRationaleOnly(apiKey, group, day, adviceText);
       if (polished) {
