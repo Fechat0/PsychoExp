@@ -227,7 +227,7 @@ async function submitSurvey(){
  if(Object.values(state.liability).reduce((a,b)=>a+b,0)!==100){status.textContent='责任分配总和必须为 100%。';status.className='status error';return}
  state.pending_payload=buildPayload();state.stage='submitting';save();render();await sendPayload();
 }
-async function sendPayload(){
+async async function sendPayload(){
  try{
   const {error}=await supabaseClient.from('experiment_data').insert(state.pending_payload);
   if(error)throw error;
