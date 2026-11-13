@@ -90,6 +90,18 @@ function validatePayload(body: unknown): string | null {
   if (body.group_type !== "human" && body.group_type !== "ai") {
     return "group_type must be human or ai.";
   }
+  const groupAdvisor: Record<string, string> = {
+    G1: "human",
+    G2: "human",
+    G3: "ai",
+    G4: "ai",
+  };
+  if (typeof body.group_code !== "string" || !(body.group_code in groupAdvisor)) {
+    return "group_code must be one of G1, G2, G3, or G4.";
+  }
+  if (groupAdvisor[body.group_code] !== body.group_type) {
+    return "group_code does not match the assigned advisor type.";
+  }
   if (!isObject(body.daily_trades) || !Array.isArray(body.daily_trades.days) || body.daily_trades.days.length > 10) {
     return "daily_trades must contain a days array with at most 10 entries.";
   }
