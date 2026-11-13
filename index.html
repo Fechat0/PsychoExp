@@ -47,6 +47,7 @@ const GROUP_CONFIG = {
  G4:{label:'实验组 4 · AI 系统',advisorType:'ai'}
 };
 const GROUP_CODES = Object.keys(GROUP_CONFIG);
+let cookieAdmissionReady=false;
 function readCookie(name){
  const prefix=encodeURIComponent(name)+'=';
  const item=document.cookie.split(';').map(x=>x.trim()).find(x=>x.startsWith(prefix));
@@ -75,6 +76,7 @@ function initializeCookieAdmission(){
  state.group_type=GROUP_CONFIG[groupCode].advisorType;
  writeCookie('pxe_participant_id',participantId);
  writeCookie('pxe_group_code',groupCode);
+ cookieAdmissionReady=readCookie('pxe_participant_id')===participantId&&readCookie('pxe_group_code')===groupCode;
 }
 
 const MARKET = [
@@ -141,7 +143,9 @@ function renderWelcome(){
  '<section class="hero"><div class="eyebrow">BEHAVIORAL DECISION STUDY / 01</div><h1>每一次选择，<br>都是一次判断。</h1><p>欢迎参与本次在线行为决策实验。请根据页面信息完成模拟交易与问卷，整个过程约需 10–15 分钟。</p></section>'+
  '<section class="card narrow"><div class="section-title"><h2>参与者准入</h2><span class="pill">COOKIE SESSION</span></div><div class="metric"><div class="label">本次参与编号（由 Cookie 自动生成）</div><div class="value" style="font-size:19px">'+esc(state.subject_id)+'</div></div><div class="notice">本页面使用必要 Cookie 保存随机参与编号与固定实验分组，避免重复输入实验编号。Cookie 不包含姓名、邮箱或手机号；请勿清除 Cookie 或切换浏览器，以免被识别为新的参与会话。</div><button class="btn primary full" id="beginBtn">确认并进入实验 <span aria-hidden="true">→</span></button><div class="status" id="welcomeStatus"></div></section>'+
  '<div style="margin:24px auto 0;text-align:center;color:#71859e;font-size:11px">研究人员入口 · <a href="./admin.html" style="color:#9bb8d7;text-decoration:none">实验管理后台</a></div>';
- document.getElementById('beginBtn').onclick=()=>{state.stage='brief';save();render()};
+ const beginButton=document.getElementById('beginBtn');
+ beginButton.onclick=()=>{state.stage='brief';save();render()};
+ if(!cookieAdmissionReady){beginButton.disabled=true;document.getElementById('welcomeStatus').textContent='浏览器未能保存必要 Cookie。请允许本站使用 Cookie 后刷新页面再进入实验。'};
 }
 function renderBrief(){
  const role=state.group_type==='human'?'高级分析师':'AI 投资分析系统';
