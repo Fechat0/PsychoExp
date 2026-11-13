@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
 :root{color-scheme:dark;--bg:#080d16;--panel:#101a29;--panel2:#142235;--line:#263850;--muted:#8fa2ba;--text:#edf4ff;--green:#36d6a2;--red:#ff6f82;--blue:#75adff;--gold:#edbd6d}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(ellipse at 10% -5%,#17324a 0,transparent 34%),var(--bg);font:14px/1.55 Inter,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif}button,input{font:inherit}.wrap{width:min(1440px,calc(100% - 36px));margin:auto;padding:25px 0 60px}.top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1c2b3f;padding-bottom:20px;margin-bottom:28px}.brand{font-weight:850;letter-spacing:.06em;display:flex;align-items:center;gap:12px}.mark{width:38px;height:38px;background:linear-gradient(130deg,#36d6a2,#71aaff);border-radius:12px;color:#06141e;display:grid;place-items:center;font-weight:950}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.16em}.sub{color:var(--muted);font-size:12px}.pill{padding:5px 10px;border-radius:99px;background:#111e2f;border:1px solid #2b4059;color:#aabed5;font-size:11px}.card{background:linear-gradient(145deg,#111e2e,#0e1724);border:1px solid #273a52;border-radius:17px;padding:21px;box-shadow:0 15px 45px #0003}.login{max-width:450px;margin:9vh auto 0}.login h1{font-size:27px;margin:8px 0}.field{display:grid;gap:8px;margin:20px 0}.field label{color:#c4d3e5;font-weight:650;font-size:13px}.field input{background:#091421;border:1px solid #30445d;color:#fff;padding:13px 14px;border-radius:10px;outline:none}.field input:focus{border-color:var(--blue)}.btn{padding:10px 15px;border-radius:10px;border:0;background:linear-gradient(100deg,#2bd39d,#75b7ff);color:#06141d;font-weight:850;cursor:pointer}.btn.secondary{background:#192b41;border:1px solid #354b66;color:#d8e5f5}.btn:disabled{opacity:.5;cursor:wait}.error{color:#ff94a1;margin-top:12px;font-size:13px}.dashboard{display:none}.dashhead{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:18px 0 22px}.dashhead h1{margin:0;font-size:28px;letter-spacing:-.03em}.actions{display:flex;gap:9px;flex-wrap:wrap}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin:18px 0}.kpi{background:#101d2d;border:1px solid #293d55;border-radius:14px;padding:17px}.kpi label{color:var(--muted);font-size:12px}.kpi strong{display:block;font-size:28px;margin-top:4px;font-variant-numeric:tabular-nums}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.chartcard h3{margin:0 0 4px;font-size:15px}.chartwrap{height:255px;position:relative;margin-top:12px}.tablecard{margin-top:16px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px}.section-head h2{font-size:17px;margin:0}.search{background:#091421;border:1px solid #30445d;color:#fff;border-radius:9px;padding:9px 12px;width:230px;max-width:50vw}.table-scroll{overflow:auto;border:1px solid #26384e;border-radius:12px}table{border-collapse:collapse;width:100%;min-width:900px;font-size:12px}th,td{text-align:left;padding:12px 13px;border-bottom:1px solid #223348;white-space:nowrap}th{background:#142338;color:#9fb4cc;font-weight:750;position:sticky;top:0}tbody tr{cursor:pointer}tbody tr:hover{background:#16263a}tbody tr:last-child td{border-bottom:0}.group{padding:4px 8px;border-radius:99px;font-size:11px}.group.human{background:#172f49;color:#91c4ff}.group.ai{background:#15352f;color:#79e7c0}.view{color:#75b7ff;text-decoration:underline;text-underline-offset:3px}.detail{margin-top:16px;display:none}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.detail h3{margin:0 0 9px;font-size:14px}.detail pre{white-space:pre-wrap;word-break:break-word;background:#091421;border:1px solid #24364d;border-radius:10px;padding:13px;color:#bed0e5;font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;max-height:420px;overflow:auto}.empty{padding:35px;text-align:center;color:var(--muted)}.status{color:var(--muted);font-size:12px;margin-top:10px}.footer-note{margin-top:22px;border:1px solid #604b2d;background:#211c15;color:#c8b58f;border-radius:11px;padding:12px 14px;font-size:12px}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(ellipse at 10% -5%,#17324a 0,transparent 34%),var(--bg);font:14px/1.55 Inter,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif}button,input{font:inherit}.wrap{width:min(1440px,calc(100% - 36px));margin:auto;padding:25px 0 60px}.top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1c2b3f;padding-bottom:20px;margin-bottom:28px}.brand{font-weight:850;letter-spacing:.06em;display:flex;align-items:center;gap:12px}.mark{width:38px;height:38px;background:linear-gradient(130deg,#36d6a2,#71aaff);border-radius:12px;color:#06141e;display:grid;place-items:center;font-weight:950}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.16em}.sub{color:var(--muted);font-size:12px}.pill{padding:5px 10px;border-radius:99px;background:#111e2f;border:1px solid #2b4059;color:#aabed5;font-size:11px}.card{background:linear-gradient(145deg,#111e2e,#0e1724);border:1px solid #273a52;border-radius:17px;padding:21px;box-shadow:0 15px 45px #0003}.login{max-width:450px;margin:9vh auto 0}.login h1{font-size:27px;margin:8px 0}.field{display:grid;gap:8px;margin:20px 0}.field label{color:#c4d3e5;font-weight:650;font-size:13px}.field input{background:#091421;border:1px solid #30445d;color:#fff;padding:13px 14px;border-radius:10px;outline:none}.field input:focus{border-color:var(--blue)}.btn{padding:10px 15px;border-radius:10px;border:0;background:linear-gradient(100deg,#2bd39d,#75b7ff);color:#06141d;font-weight:850;cursor:pointer}.btn.secondary{background:#192b41;border:1px solid #354b66;color:#d8e5f5}.btn:disabled{opacity:.5;cursor:wait}.error{color:#ff94a1;margin-top:12px;font-size:13px}.dashboard{display:none}.dashhead{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:18px 0 22px}.dashhead h1{margin:0;font-size:28px;letter-spacing:-.03em}.actions{display:flex;gap:9px;flex-wrap:wrap}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin:18px 0}.kpi{background:#101d2d;border:1px solid #293d55;border-radius:14px;padding:17px}.kpi label{color:var(--muted);font-size:12px}.kpi strong{display:block;font-size:28px;margin-top:4px;font-variant-numeric:tabular-nums}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.chartcard h3{margin:0 0 4px;font-size:15px}.chartwrap{height:255px;position:relative;margin-top:12px}.tablecard{margin-top:16px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px}.section-head h2{font-size:17px;margin:0}.search{background:#091421;border:1px solid #30445d;color:#fff;border-radius:9px;padding:9px 12px;width:230px;max-width:50vw}.table-scroll{overflow:auto;border:1px solid #26384e;border-radius:12px}table{border-collapse:collapse;width:100%;min-width:900px;font-size:12px}th,td{text-align:left;padding:12px 13px;border-bottom:1px solid #223348;white-space:nowrap}th{background:#142338;color:#9fb4cc;font-weight:750;position:sticky;top:0}tbody tr{cursor:pointer}tbody tr:hover{background:#16263a}tbody tr:last-child td{border-bottom:0}.group{padding:4px 8px;border-radius:99px;font-size:11px}.group.human{background:#172f49;color:#91c4ff}.group.ai{background:#15352f;color:#79e7c0}.view{color:#75b7ff;text-decoration:underline;text-underline-offset:3px}.detail{margin-top:16px;display:none}.detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.detail h3{margin:0 0 9px;font-size:14px}.detail pre{white-space:pre-wrap;word-break:break-word;background:#091421;border:1px solid #24364d;border-radius:10px;padding:13px;color:#bed0e5;font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;max-height:420px;overflow:auto}.empty{padding:35px;text-align:center;color:var(--muted)}.status{color:var(--muted);font-size:12px;margin-top:10px}.footer-note{margin-top:22px;border:1px solid #604b2d;background:#211c15;color:#c8b58f;border-radius:11px;padding:12px 14px;font-size:12px}
 @media(max-width:980px){.grid{grid-template-columns:1fr}.chartwrap{height:230px}.kpis{grid-template-columns:repeat(2,1fr)}}@media(max-width:620px){.wrap{width:calc(100% - 22px);padding-top:14px}.dashhead{align-items:flex-start;flex-direction:column}.kpis{gap:8px}.kpi{padding:13px}.kpi strong{font-size:23px}.section-head{align-items:flex-start;flex-direction:column}.search{width:100%;max-width:none}.detail-grid{grid-template-columns:1fr}.top .pill{display:none}}
 </style>
 </head>
@@ -17,8 +17,12 @@
 <div class="wrap">
 <header class="top"><div class="brand"><div class="mark">PX</div><div>DECISION LAB<small>EXPERIMENT ADMIN CONSOLE</small></div></div><span class="pill">PX-01 · RESEARCH DATA</span></header>
 <section id="loginPanel" class="card login">
- <div class="sub">RESTRICTED AREA / PXE ADMIN</div><h1>实验管理后台</h1><p class="sub">请验证管理员口令以查看实验参与数据。</p>
- <form id="loginForm"><div class="field"><label for="password">管理员密码</label><input id="password" type="password" autocomplete="current-password" placeholder="输入管理员密码" required></div><button class="btn" type="submit" style="width:100%">验证并进入后台 →</button><div id="loginError" class="error"></div></form>
+ <div class="sub">RESTRICTED AREA / PXE ADMIN</div><h1>实验管理后台</h1><p class="sub">使用已获管理员授权的 Supabase Auth 账户登录。未经授权的账户无法读取实验记录。</p>
+ <form id="loginForm">
+  <div class="field"><label for="email">管理员邮箱</label><input id="email" type="email" autocomplete="username" placeholder="admin@example.com" required></div>
+  <div class="field"><label for="password">管理员密码</label><input id="password" type="password" autocomplete="current-password" placeholder="Supabase Auth 密码" required></div>
+  <button class="btn" type="submit" style="width:100%">安全登录后台 →</button><div id="loginError" class="error"></div>
+ </form>
 </section>
 <main id="dashboard" class="dashboard">
  <div class="dashhead"><div><div class="sub">EXPERIMENT OVERVIEW</div><h1>数据总览</h1><div id="loadedAt" class="sub">等待加载数据库……</div></div><div class="actions"><button class="btn secondary" id="refreshBtn">↻ 刷新数据</button><button class="btn" id="exportBtn">↓ 导出 CSV</button><button class="btn secondary" id="logoutBtn">退出</button></div></div>
@@ -30,23 +34,65 @@
   <div class="card chartcard"><h3>信任感知</h3><div class="sub">能力、仁慈、诚信均值（1–7 分）</div><div class="chartwrap"><canvas id="trustChart"></canvas></div></div>
  </section>
  <section class="card tablecard"><div class="section-head"><div><h2>参与者数据</h2><div class="sub">点击任意一行查看该被试的交易记录与顾问建议日志</div></div><input id="searchInput" class="search" placeholder="按被试编号筛选…"></div><div class="table-scroll"><table><thead><tr><th>被试编号</th><th>实验组别</th><th>责任转移</th><th>能力</th><th>仁慈</th><th>诚信</th><th>未来信任</th><th>操纵检验</th><th>最终资产</th><th>提交时间</th><th>详情</th></tr></thead><tbody id="dataRows"><tr><td colspan="11" class="empty">尚未加载数据</td></tr></tbody></table></div><div id="rowCount" class="status"></div></section>
- <section class="card detail" id="detailPanel"><div class="section-head"><div><h2 id="detailTitle">被试详情</h2><div class="sub" id="detailMeta"></div></div><button class="btn secondary" id="closeDetail">关闭详情</button></div><div class="detail-grid"><div><h3>每日交易记录（JSON）</h3><pre id="tradeDetail"></pre></div><div><h3>顾问建议日志（JSON）</h3><pre id="adviceDetail"></pre></div></div></section>
- <div class="footer-note">安全提示：当前版本按需求将管理员密码写在前端，并允许 anon 角色读取数据以便浏览器后台查询。这只能用于受控的课堂/测试环境；任何知道项目 Supabase URL 与 Publishable Key 的人都可能绕过页面密码直接读取数据。正式收集真实被试信息前，应改为 Supabase Auth + 服务端授权读取，并限制 RLS。</div>
+ <section class="card detail" id="detailPanel"><div class="section-head"><div><h2 id="detailTitle">被试详情</h2><div class="sub" id="detailMeta"></div></div><button class="btn secondary" id="closeDetail">关闭详情</button></div><div class="detail-grid"><div><h3>每日交易记录</h3><pre id="tradeDetail"></pre></div><div><h3>顾问建议日志</h3><pre id="adviceDetail"></pre></div><div><h3>完整聊天记录（含撤回事件）</h3><pre id="chatDetail"></pre></div></div></section>
+ <div class="footer-note">访问控制已启用：匿名被试端仅有提交权限；读取实验记录需要 Supabase Auth 登录，并且账户的 app_metadata.role 必须为 admin。请勿将管理员账号交给参与者使用。</div>
 </main>
 </div>
 <script>
 const SUPABASE_URL='https://zbxbvdqbjlhydpoinodv.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_HRkpwvk3B-cw3c9FUs9Bcw_6K1vFSJf';
 const supabaseClient=window.supabase.createClient('https://zbxbvdqbjlhydpoinodv.supabase.co','sb_publishable_HRkpwvk3B-cw3c9FUs9Bcw_6K1vFSJf');
-const ADMIN_PASSWORD='admin888';
 let allRows=[],charts={};
 const $=id=>document.getElementById(id);
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fmt(v,d=2){return v==null?'—':Number(v).toFixed(d)}
-function isAuthed(){return sessionStorage.getItem('pxe_admin_unlocked')==='1'}
-function showDashboard(){ $('loginPanel').style.display='none';$('dashboard').style.display='block';loadData() }
-$('loginForm').addEventListener('submit',e=>{e.preventDefault();if($('password').value===ADMIN_PASSWORD){sessionStorage.setItem('pxe_admin_unlocked','1');$('loginError').textContent='';showDashboard()}else{$('loginError').textContent='密码错误，请重试。';$('password').select()}});
-$('logoutBtn').onclick=()=>{sessionStorage.removeItem('pxe_admin_unlocked');$('dashboard').style.display='none';$('loginPanel').style.display='block';$('password').value=''};
+function showLogin(message=''){
+ $('dashboard').style.display='none';$('loginPanel').style.display='block';
+ if(message)$('loginError').textContent=message;
+}
+async function enterAdmin(session){
+ if(session?.user?.app_metadata?.role!=='admin'){
+  if(session)await supabaseClient.auth.signOut();
+  showLogin('此 Supabase 账户尚未获得管理员权限。');
+  return false;
+ }
+ $('loginPanel').style.display='none';$('dashboard').style.display='block';$('loginError').textContent='';
+ await loadData();
+ return true;
+}
+$('loginForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ const button=$('loginForm').querySelector('button[type="submit"]');
+ button.disabled=true;$('loginError').textContent='';
+ try{
+  const {data,error}=await supabaseClient.auth.signInWithPassword({
+   email:$('email').value.trim(),password:$('password').value
+  });
+  if(error)throw error;
+  if(data.user?.app_metadata?.role!=='admin'){
+   await supabaseClient.auth.signOut();
+   throw new Error('账户已登录，但没有管理员读取权限。');
+  }
+  await enterAdmin(data.session);
+ }catch(err){
+  $('loginError').textContent=err.message||'登录失败，请检查邮箱和密码。';
+ }finally{button.disabled=false}
+});
+$('logoutBtn').onclick=async()=>{
+ await supabaseClient.auth.signOut();
+ $('dashboard').style.display='none';$('loginPanel').style.display='block';
+ $('password').value='';
+};
+supabaseClient.auth.onAuthStateChange((event)=>{
+ if(event==='SIGNED_OUT'){
+  $('dashboard').style.display='none';$('loginPanel').style.display='block';
+ }
+});
+(async()=>{
+ const {data,error}=await supabaseClient.auth.getSession();
+ if(error){showLogin('无法读取登录状态：'+error.message);return}
+ if(data.session)await enterAdmin(data.session);
+})();
 $('refreshBtn').onclick=loadData;$('closeDetail').onclick=()=>{$('detailPanel').style.display='none'};
 $('searchInput').addEventListener('input',renderRows);
 function groupRows(g){return allRows.filter(r=>r.group_type===g)}
@@ -97,13 +143,14 @@ function showDetail(id){
  const adv=Array.isArray(d.advice_log)?d.advice_log:(r.advice_log||[]);
  $('detailTitle').textContent='被试详情 · '+r.subject_id;$('detailMeta').textContent=(r.group_type==='human'?'高级分析师组':'AI 系统组')+' · 提交时间 '+(r.created_at?new Date(r.created_at).toLocaleString('zh-CN'):'未知');
  $('tradeDetail').textContent=JSON.stringify({daily_trades:days,final_cash:r.final_cash,final_shares:r.final_shares,final_assets:r.final_assets},null,2);
- $('adviceDetail').textContent=JSON.stringify({advice_log:adv,chat_log:Array.isArray(d.chat_log)?d.chat_log:(r.chat_log||[])},null,2);
+ $('adviceDetail').textContent=JSON.stringify({advice_log:adv},null,2);
+ const chat=parseJSON(r.chat_log);$('chatDetail').textContent=JSON.stringify(Array.isArray(chat)?chat:[],null,2);
  $('detailPanel').style.display='block';$('detailPanel').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function csvCell(v){let s=typeof v==='object'&&v!==null?JSON.stringify(v):String(v??'');if(/^[\s]*[=+\-@]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'}
 function exportCSV(){
  if(!allRows.length){alert('当前没有可导出的数据。');return}
- const cols=['subject_id','group_type','daily_trades','liability_self_percent','liability_advisor_percent','liability_market_percent','responsibility_shift_mean','trust_ability_mean','trust_benevolence_mean','trust_integrity_mean','future_trust_mean','manipulation_check','raw_answers','final_cash','final_shares','final_assets','created_at'];
+ const cols=['subject_id','group_type','daily_trades','chat_log','liability_self_percent','liability_advisor_percent','liability_market_percent','responsibility_shift_mean','trust_ability_mean','trust_benevolence_mean','trust_integrity_mean','future_trust_mean','manipulation_check','raw_answers','final_cash','final_shares','final_assets','created_at'];
  const lines=[cols.map(csvCell).join(',')];for(const r of allRows)lines.push(cols.map(k=>csvCell(r[k])).join(','));
  const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='PychoExp_experiment_data_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
 }
