@@ -38,6 +38,45 @@ const SUPABASE_ANON_KEY = 'sb_publishable_HRkpwvk3B-cw3c9FUs9Bcw_6K1vFSJf';
 const supabaseClient = window.supabase.createClient('https://zbxbvdqbjlhydpoinodv.supabase.co', 'sb_publishable_HRkpwvk3B-cw3c9FUs9Bcw_6K1vFSJf');
 const EDGE_FUNCTION_URL = 'https://zbxbvdqbjlhydpoinodv.supabase.co/functions/v1/generate-advice';
 const STORAGE_KEY = 'pxe_experiment_session_v1';
+// Four-arm 2x2 assignment: two human-advisor arms and two AI-advisor arms.
+// The second subgroup is kept as a separate arm; its treatment distinction can be configured here.
+const GROUP_CONFIG = {
+ G1:{label:'实验组 1 · 人类顾问',advisorType:'human'},
+ G2:{label:'实验组 2 · 人类顾问',advisorType:'human'},
+ G3:{label:'实验组 3 · AI 系统',advisorType:'ai'},
+ G4:{label:'实验组 4 · AI 系统',advisorType:'ai'}
+};
+const GROUP_CODES = Object.keys(GROUP_CONFIG);
+function readCookie(name){
+ const prefix=encodeURIComponent(name)+'=';
+ const item=document.cookie.split(';').map(x=>x.trim()).find(x=>x.startsWith(prefix));
+ return item?decodeURIComponent(item.slice(prefix.length)):'';
+}
+function writeCookie(name,value){
+ document.cookie=encodeURIComponent(name)+'='+encodeURIComponent(value)+'; Path=/; Max-Age=31536000; SameSite=Lax; Secure';
+}
+function createParticipantId(){
+ const raw=(window.crypto&&crypto.randomUUID)?crypto.randomUUID().replace(/-/g,'').slice(0,10):Math.random().toString(36).slice(2,12).toUpperCase();
+ return 'PXE-'+raw.toUpperCase();
+}
+function initializeCookieAdmission(){
+ const previousId=state.subject_id;
+ const previousType=state.group_type;
+ let participantId=readCookie('pxe_participant_id')||(previousId&&previousType?previousId:'');
+ let groupCode=readCookie('pxe_group_code')||state.group_code||'';
+ if(!GROUP_CONFIG[groupCode]){
+  if(previousType==='human')groupCode='G1';
+  else if(previousType==='ai')groupCode='G3';
+  else groupCode=GROUP_CODES[Math.floor(Math.random()*GROUP_CODES.length)];
+ }
+ if(!participantId)participantId=createParticipantId();
+ state.subject_id=participantId;
+ state.group_code=groupCode;
+ state.group_type=GROUP_CONFIG[groupCode].advisorType;
+ writeCookie('pxe_participant_id',participantId);
+ writeCookie('pxe_group_code',groupCode);
+}
+
 const MARKET = [
  {day:1,date:'交易日 01',price:100.00,change:0,headline:'震荡整理'},
  {day:2,date:'交易日 02',price:101.30,change:1.30,headline:'小幅上涨'},
@@ -73,9 +112,10 @@ const QUESTIONS = [
  {id:'future_1',group:'未来信任',text:'未来再次进行类似投资时，我愿意继续听取这位顾问的建议。'},
  {id:'future_2',group:'未来信任',text:'在未来的投资决策中，我愿意再次使用这位顾问。'}
 ];
-const DEFAULT_STATE = {version:1,stage:'welcome',subject_id:'',group_type:null,day_index:0,cash:100000,shares:0,current_action:null,daily_trades:[],advice_log:[],transition:null,liability:{self:40,advisor:30,market:30},answers:{},manipulation_check:'',pending_payload:null,chatHistory:[],chatCounts:{},chatOpenDay:0};
+const DEFAULT_STATE = {version:1,stage:'welcome',subject_id:'',group_code:null,group_type:null,day_index:0,cash:100000,shares:0,current_action:null,daily_trades:[],advice_log:[],transition:null,liability:{self:40,advisor:30,market:30},answers:{},manipulation_check:'',pending_payload:null,chatHistory:[],chatCounts:{},chatOpenDay:0};
 function loadState(){try{const s=JSON.parse(sessionStorage.getItem(STORAGE_KEY)||'null');if(s&&s.version===1)return {...structuredClone(DEFAULT_STATE),...s};}catch(e){console.warn('session restore failed',e)}return structuredClone(DEFAULT_STATE)}
 let state=loadState();
+initializeCookieAdmission();
 let chatHistory=Array.isArray(state.chatHistory)?state.chatHistory:[];
 window.chatHistory=chatHistory;
 state.chatHistory=chatHistory;
@@ -99,9 +139,9 @@ function render(){
 function renderWelcome(){
  app.innerHTML=renderSteps(0)+
  '<section class="hero"><div class="eyebrow">BEHAVIORAL DECISION STUDY / 01</div><h1>每一次选择，<br>都是一次判断。</h1><p>欢迎参与本次在线行为决策实验。请根据页面信息完成模拟交易与问卷，整个过程约需 10–15 分钟。</p></section>'+
- '<section class="card narrow"><div class="section-title"><h2>参与者登记</h2><span class="pill">SESSION PX-01</span></div><div class="field"><label for="subjectId">被试编号 / Participant ID</label><input id="subjectId" maxlength="64" autocomplete="off" placeholder="请输入研究者分配的编号" value="'+esc(state.subject_id)+'"></div><div class="notice">请使用研究者提供的编号，不要填写姓名、手机号等直接身份信息。实验进度会保存在当前浏览器会话中。</div><button class="btn primary full" id="beginBtn">确认并进入实验 <span aria-hidden="true">→</span></button><div class="status" id="welcomeStatus"></div></section>'+
+ '<section class="card narrow"><div class="section-title"><h2>参与者准入</h2><span class="pill">COOKIE SESSION</span></div><div class="metric"><div class="label">本次参与编号（由 Cookie 自动生成）</div><div class="value" style="font-size:19px">'+esc(state.subject_id)+'</div></div><div class="notice">本页面使用必要 Cookie 保存随机参与编号与固定实验分组，避免重复输入实验编号。Cookie 不包含姓名、邮箱或手机号；请勿清除 Cookie 或切换浏览器，以免被识别为新的参与会话。</div><button class="btn primary full" id="beginBtn">确认并进入实验 <span aria-hidden="true">→</span></button><div class="status" id="welcomeStatus"></div></section>'+
  '<div style="margin:24px auto 0;text-align:center;color:#71859e;font-size:11px">研究人员入口 · <a href="./admin.html" style="color:#9bb8d7;text-decoration:none">实验管理后台</a></div>';
- document.getElementById('beginBtn').onclick=()=>{const id=document.getElementById('subjectId').value.trim();if(!id){document.getElementById('welcomeStatus').textContent='请先输入被试编号。';return}state.subject_id=id;state.group_type=Math.random()<.5?'human':'ai';state.stage='brief';save();render()};
+ document.getElementById('beginBtn').onclick=()=>{state.stage='brief';save();render()};
 }
 function renderBrief(){
  const role=state.group_type==='human'?'高级分析师':'AI 投资分析系统';
@@ -219,7 +259,7 @@ function buildPayload(){
  const integrity=mean(get(['integrity_1','integrity_2']));
  const future=mean(get(['future_1','future_2']));
  const trades=state.daily_trades.slice().sort((a,b)=>a.day-b.day);
- return {subject_id:state.subject_id,group_type:state.group_type,daily_trades:{days:trades,advice_log:state.advice_log,market:MARKET},chat_log:chatHistory,liability_self_percent:state.liability.self,liability_advisor_percent:state.liability.advisor,liability_market_percent:state.liability.market,responsibility_shift_mean:Number(shift.toFixed(3)),trust_ability_mean:Number(ability.toFixed(3)),trust_benevolence_mean:Number(benevolence.toFixed(3)),trust_integrity_mean:Number(integrity.toFixed(3)),future_trust_mean:Number(future.toFixed(3)),manipulation_check:state.manipulation_check,raw_answers:state.answers,final_cash:Number(state.cash.toFixed(2)),final_shares:state.shares,final_assets:Number(asset(MARKET[9].price).toFixed(2))};
+ return {subject_id:state.subject_id,group_code:state.group_code,group_type:state.group_type,daily_trades:{days:trades,advice_log:state.advice_log,market:MARKET},chat_log:chatHistory,liability_self_percent:state.liability.self,liability_advisor_percent:state.liability.advisor,liability_market_percent:state.liability.market,responsibility_shift_mean:Number(shift.toFixed(3)),trust_ability_mean:Number(ability.toFixed(3)),trust_benevolence_mean:Number(benevolence.toFixed(3)),trust_integrity_mean:Number(integrity.toFixed(3)),future_trust_mean:Number(future.toFixed(3)),manipulation_check:state.manipulation_check,raw_answers:state.answers,final_cash:Number(state.cash.toFixed(2)),final_shares:state.shares,final_assets:Number(asset(MARKET[9].price).toFixed(2))};
 }
 async function submitSurvey(){
  const missing=QUESTIONS.filter(q=>!state.answers[q.id]);const status=document.getElementById('surveyStatus');
