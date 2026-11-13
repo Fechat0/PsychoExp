@@ -42,7 +42,14 @@
 <script>
 const SUPABASE_URL='https://zbxbvdqbjlhydpoinodv.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_HRkpwvk3B-cw3c9FUs9Bcw_6K1vFSJf';
-const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{
+ auth:{
+  autoRefreshToken:true,
+  persistSession:true,
+  detectSessionInUrl:false,
+  storageKey:'pxe_admin_auth_v1'
+ }
+});
 const GROUPS={
  G1:{label:'G1 · 人类顾问组 1',advisor:'human'},
  G2:{label:'G2 · 人类顾问组 2',advisor:'human'},
@@ -65,31 +72,73 @@ function showLogin(message=''){
  $('dashboard').style.display='none';$('loginPanel').style.display='block';
  if(message)$('loginError').textContent=message;
 }
-async function enterAdmin(session){
- if(session?.user?.app_metadata?.role!=='admin'){
-  if(session)await supabaseClient.auth.signOut();
-  showLogin('此 Supabase 账户尚未获得管理员权限。');return false;
+async function getFreshAuthContext(){
+ const {data:storedData,error:storedError}=await supabaseClient.auth.getSession();
+ if(storedError)throw new Error('读取本地会话失败：'+storedError.message);
+ if(!storedData.session)return null;
+
+ // Refresh once so updated app_metadata is reflected in the JWT used by RLS.
+ const {data:refreshData,error:refreshError}=await supabaseClient.auth.refreshSession();
+ if(refreshError)throw new Error('会话刷新失败：'+refreshError.message+'。请重新登录；不要反复修改管理员角色。');
+ if(!refreshData.session)throw new Error('Supabase 未返回可用会话，请重新登录。');
+
+ // Verify the user against the Auth server, not only locally stored session data.
+ const {data:userData,error:userError}=await supabaseClient.auth.getUser();
+ if(userError)throw new Error('服务器端账户核验失败：'+userError.message);
+ if(!userData.user)throw new Error('Supabase 未返回已验证的用户信息。');
+
+ return {session:refreshData.session,user:userData.user};
+}
+async function enterAdmin(){
+ let context;
+ try{
+  context=await getFreshAuthContext();
+ }catch(error){
+  showLogin(error.message||'无法验证登录状态，请重新登录。');
+  return false;
+ }
+ if(!context){showLogin();return false}
+
+ const jwtRole=context.session.user?.app_metadata?.role;
+ const serverRole=context.user?.app_metadata?.role;
+ if(jwtRole!=='admin'||serverRole!=='admin'){
+  showLogin('账户已通过 Supabase Auth 登录，但最新权限声明仍未确认管理员身份。请先确认 app_metadata.role = admin；权限保存后重新登录或重新载入本页。');
+  return false;
  }
  $('loginPanel').style.display='none';$('dashboard').style.display='block';$('loginError').textContent='';
- await loadData();return true;
+ await loadData();
+ return true;
 }
 $('loginForm').addEventListener('submit',async e=>{
- e.preventDefault();const button=$('loginForm').querySelector('button[type="submit"]');
+ e.preventDefault();
+ const button=$('loginForm').querySelector('button[type="submit"]');
  button.disabled=true;$('loginError').textContent='';
  try{
-  const {data,error}=await supabaseClient.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+  const {error}=await supabaseClient.auth.signInWithPassword({
+   email:$('email').value.trim(),password:$('password').value
+  });
   if(error)throw error;
-  if(data.user?.app_metadata?.role!=='admin'){await supabaseClient.auth.signOut();throw new Error('账户已登录，但没有管理员读取权限。')}
-  await enterAdmin(data.session);
- }catch(err){$('loginError').textContent=err.message||'登录失败，请检查邮箱和密码。'}
- finally{button.disabled=false}
+  await enterAdmin();
+ }catch(err){
+  $('loginError').textContent=err.message||'登录失败，请检查邮箱和密码。';
+ }finally{button.disabled=false}
 });
-$('logoutBtn').onclick=async()=>{await supabaseClient.auth.signOut();$('dashboard').style.display='none';$('loginPanel').style.display='block';$('password').value=''};
-supabaseClient.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT'){ $('dashboard').style.display='none';$('loginPanel').style.display='block'; }});
+$('logoutBtn').onclick=async()=>{
+ const {error}=await supabaseClient.auth.signOut();
+ if(error){$('loadStatus').textContent='退出登录失败：'+error.message;return}
+ $('dashboard').style.display='none';$('loginPanel').style.display='block';
+ $('password').value='';
+};
+supabaseClient.auth.onAuthStateChange((event)=>{
+ // Keep the callback synchronous to avoid Auth lock/deadlock issues.
+ if(event==='SIGNED_OUT'){
+  $('dashboard').style.display='none';$('loginPanel').style.display='block';
+ }
+});
 (async()=>{
  const {data,error}=await supabaseClient.auth.getSession();
  if(error){showLogin('无法读取登录状态：'+error.message);return}
- if(data.session)await enterAdmin(data.session);
+ if(data.session)await enterAdmin();
 })();
 $('refreshBtn').onclick=loadData;
 $('closeDetail').onclick=()=>{$('detailPanel').style.display='none'};
