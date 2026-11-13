@@ -72,37 +72,16 @@ function showLogin(message=''){
  $('dashboard').style.display='none';$('loginPanel').style.display='block';
  if(message)$('loginError').textContent=message;
 }
-async function getFreshAuthContext(){
- const {data:storedData,error:storedError}=await supabaseClient.auth.getSession();
- if(storedError)throw new Error('读取本地会话失败：'+storedError.message);
- if(!storedData.session)return null;
-
- // Refresh once so updated app_metadata is reflected in the JWT used by RLS.
- const {data:refreshData,error:refreshError}=await supabaseClient.auth.refreshSession();
- if(refreshError)throw new Error('会话刷新失败：'+refreshError.message+'。请重新登录；不要反复修改管理员角色。');
- if(!refreshData.session)throw new Error('Supabase 未返回可用会话，请重新登录。');
-
- // Verify the user against the Auth server, not only locally stored session data.
- const {data:userData,error:userError}=await supabaseClient.auth.getUser();
- if(userError)throw new Error('服务器端账户核验失败：'+userError.message);
- if(!userData.user)throw new Error('Supabase 未返回已验证的用户信息。');
-
- return {session:refreshData.session,user:userData.user};
-}
-async function enterAdmin(){
- let context;
- try{
-  context=await getFreshAuthContext();
- }catch(error){
-  showLogin(error.message||'无法验证登录状态，请重新登录。');
-  return false;
+function networkErrorText(stage,error){
+ const message=String(error?.message||error||'未知错误');
+ if(/failed to fetch|networkerror|load failed/i.test(message)){
+  return stage+'：浏览器无法连接 Supabase Auth（'+SUPABASE_URL+'/auth/v1）。这不是密码错误或 RLS 拒绝；请使用正式 GitHub Pages 地址，并检查浏览器网络、DNS、代理/校园网、广告拦截或隐私扩展。';
  }
- if(!context){showLogin();return false}
-
- const jwtRole=context.session.user?.app_metadata?.role;
- const serverRole=context.user?.app_metadata?.role;
- if(jwtRole!=='admin'||serverRole!=='admin'){
-  showLogin('账户已通过 Supabase Auth 登录，但最新权限声明仍未确认管理员身份。请先确认 app_metadata.role = admin；权限保存后重新登录或重新载入本页。');
+ return stage+'：'+message;
+}
+async function enterAdmin(user){
+ if(user?.app_metadata?.role!=='admin'){
+  showLogin('登录请求已完成，但当前会话的 app_metadata.role 不是 admin。请退出后重新登录以获取最新权限声明；不要修改数据库 RLS。');
   return false;
  }
  $('loginPanel').style.display='none';$('dashboard').style.display='block';$('loginError').textContent='';
@@ -114,31 +93,39 @@ $('loginForm').addEventListener('submit',async e=>{
  const button=$('loginForm').querySelector('button[type="submit"]');
  button.disabled=true;$('loginError').textContent='';
  try{
-  const {error}=await supabaseClient.auth.signInWithPassword({
+  // signInWithPassword returns a server-issued user and fresh JWT. Avoid
+  // immediately forcing a second refreshSession/getUser network round-trip.
+  const {data,error}=await supabaseClient.auth.signInWithPassword({
    email:$('email').value.trim(),password:$('password').value
   });
   if(error)throw error;
-  await enterAdmin();
+  const user=data.user||data.session?.user;
+  if(!user)throw new Error('Supabase Auth 已响应，但没有返回用户信息。');
+  await enterAdmin(user);
  }catch(err){
-  $('loginError').textContent=err.message||'登录失败，请检查邮箱和密码。';
+  $('loginError').textContent=networkErrorText('管理员登录失败',err);
  }finally{button.disabled=false}
 });
 $('logoutBtn').onclick=async()=>{
  const {error}=await supabaseClient.auth.signOut();
- if(error){$('loadStatus').textContent='退出登录失败：'+error.message;return}
+ if(error){$('loadStatus').textContent=networkErrorText('退出登录失败',error);return}
  $('dashboard').style.display='none';$('loginPanel').style.display='block';
  $('password').value='';
 };
 supabaseClient.auth.onAuthStateChange((event)=>{
- // Keep the callback synchronous to avoid Auth lock/deadlock issues.
+ // Keep this callback synchronous; Supabase Auth holds an internal lock here.
  if(event==='SIGNED_OUT'){
   $('dashboard').style.display='none';$('loginPanel').style.display='block';
  }
 });
 (async()=>{
- const {data,error}=await supabaseClient.auth.getSession();
- if(error){showLogin('无法读取登录状态：'+error.message);return}
- if(data.session)await enterAdmin();
+ try{
+  const {data,error}=await supabaseClient.auth.getSession();
+  if(error){showLogin(networkErrorText('恢复登录状态失败',error));return}
+  if(data.session)await enterAdmin(data.session.user);
+ }catch(error){
+  showLogin(networkErrorText('恢复登录状态失败',error));
+ }
 })();
 $('refreshBtn').onclick=loadData;
 $('closeDetail').onclick=()=>{$('detailPanel').style.display='none'};
@@ -262,8 +249,8 @@ async function loadData(){
   $('loadStatus').textContent='数据加载完成 · '+allRows.length+' 条记录 · G1–G4 四组';
   renderCharts();renderChiSquare();renderRows();
  }catch(e){
-  $('loadStatus').textContent='读取失败：'+(e.message||e);
-  $('dataRows').innerHTML='<tr><td colspan="12" class="empty">无法读取数据，请检查表名、RLS 策略和 Publishable Key。</td></tr>';
+  $('loadStatus').textContent=networkErrorText('读取实验数据失败（'+SUPABASE_URL+'/rest/v1/experiment_data）',e);
+  $('dataRows').innerHTML='<tr><td colspan="12" class="empty">数据读取失败；请查看上方诊断信息。</td></tr>';
   $('chiSummary').textContent='统计失败：'+(e.message||e);
  }finally{$('refreshBtn').disabled=false}
 }
