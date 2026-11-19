@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
 :root{color-scheme:dark;--bg:#080d16;--panel:#101a29;--panel2:#142235;--line:#263850;--muted:#8fa2ba;--text:#edf4ff;--green:#36d6a2;--red:#ff6f82;--blue:#75adff;--gold:#edbd6d}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(ellipse at 10% -5%,#17324a 0,transparent 34%),var(--bg);font:14px/1.55 Inter,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif}button,input{font:inherit}.wrap{width:min(1440px,calc(100% - 36px));margin:auto;padding:25px 0 60px}.top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1c2b3f;padding-bottom:20px;margin-bottom:28px}.brand{font-weight:850;letter-spacing:.06em;display:flex;align-items:center;gap:12px}.mark{width:38px;height:38px;background:linear-gradient(130deg,#36d6a2,#71aaff);border-radius:12px;color:#06141e;display:grid;place-items:center;font-weight:950}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.16em}.sub{color:var(--muted);font-size:12px}.pill{padding:5px 10px;border-radius:99px;background:#111e2f;border:1px solid #2b4059;color:#aabed5;font-size:11px}.card{background:linear-gradient(145deg,#111e2e,#0e1724);border:1px solid #273a52;border-radius:17px;padding:21px;box-shadow:0 15px 45px #0003}.login{max-width:450px;margin:9vh auto 0}.login h1{font-size:27px;margin:8px 0}.field{display:grid;gap:8px;margin:20px 0}.field label{color:#c4d3e5;font-weight:650;font-size:13px}.field input{background:#091421;border:1px solid #30445d;color:#fff;padding:13px 14px;border-radius:10px;outline:none}.field input:focus{border-color:var(--blue)}.btn{padding:10px 15px;border-radius:10px;border:0;background:linear-gradient(100deg,#2bd39d,#75b7ff);color:#06141d;font-weight:850;cursor:pointer}.btn.secondary{background:#192b41;border:1px solid #354b66;color:#d8e5f5}.btn:disabled{opacity:.5;cursor:wait}.error{color:#ff94a1;margin-top:12px;font-size:13px}.dashboard{display:none}.dashhead{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:18px 0 22px}.dashhead h1{margin:0;font-size:28px;letter-spacing:-.03em}.actions{display:flex;gap:9px;flex-wrap:wrap}.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:13px;margin:18px 0}.kpi{background:#101d2d;border:1px solid #293d55;border-radius:14px;padding:17px}.kpi label{color:var(--muted);font-size:12px}.kpi strong{display:block;font-size:28px;margin-top:4px;font-variant-numeric:tabular-nums}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.chartcard h3{margin:0 0 4px;font-size:15px}.chartwrap{height:255px;position:relative;margin-top:12px}.tablecard{margin-top:16px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px}.section-head h2{font-size:17px;margin:0}.search{background:#091421;border:1px solid #30445d;color:#fff;border-radius:9px;padding:9px 12px;width:230px;max-width:50vw}.table-scroll{overflow:auto;border:1px solid #26384e;border-radius:12px}table{border-collapse:collapse;width:100%;min-width:900px;font-size:12px}th,td{text-align:left;padding:12px 13px;border-bottom:1px solid #223348;white-space:nowrap}th{background:#142338;color:#9fb4cc;font-weight:750;position:sticky;top:0}tbody tr{cursor:pointer}tbody tr:hover{background:#16263a}tbody tr:last-child td{border-bottom:0}.group{padding:4px 8px;border-radius:99px;font-size:11px}.group.human{background:#172f49;color:#91c4ff}.group.ai{background:#15352f;color:#79e7c0}.group-code{display:inline-block;padding:4px 8px;border-radius:8px;background:#1b2940;color:#c5d8f1;font-weight:800}.stats-card{margin-top:16px}.stats-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}.stats-metric{background:#0b1523;border:1px solid #26384e;border-radius:11px;padding:13px}.stats-metric label{display:block;color:var(--muted);font-size:11px}.stats-metric strong{display:block;font-size:20px;margin-top:4px}.stat-table{min-width:520px;margin-top:12px}.stat-table th,.stat-table td{padding:9px 11px}.stat-note{font-size:12px;color:#aabbd0;margin-top:10px}.stat-warning{color:#ffd18a}.stat-good{color:#7de2bb}.view{color:#75b7ff;text-decoration:underline;text-underline-offset:3px}.suggestion-content{white-space:pre-wrap;overflow-wrap:anywhere;min-width:300px;max-width:760px;color:#d9e8f8;line-height:1.7}.detail{margin-top:16px;display:none}.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.detail h3{margin:0 0 9px;font-size:14px}.detail pre{white-space:pre-wrap;word-break:break-word;background:#091421;border:1px solid #24364d;border-radius:10px;padding:13px;color:#bed0e5;font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;max-height:420px;overflow:auto}.empty{padding:35px;text-align:center;color:var(--muted)}.status{color:var(--muted);font-size:12px;margin-top:10px}.footer-note{margin-top:22px;border:1px solid #604b2d;background:#211c15;color:#c8b58f;border-radius:11px;padding:12px 14px;font-size:12px}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(ellipse at 10% -5%,#17324a 0,transparent 34%),var(--bg);font:14px/1.55 Inter,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif}button,input{font:inherit}.wrap{width:min(1440px,calc(100% - 36px));margin:auto;padding:25px 0 60px}.top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1c2b3f;padding-bottom:20px;margin-bottom:28px}.brand{font-weight:850;letter-spacing:.06em;display:flex;align-items:center;gap:12px}.mark{width:38px;height:38px;background:linear-gradient(130deg,#36d6a2,#71aaff);border-radius:12px;color:#06141e;display:grid;place-items:center;font-weight:950}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.16em}.sub{color:var(--muted);font-size:12px}.pill{padding:5px 10px;border-radius:99px;background:#111e2f;border:1px solid #2b4059;color:#aabed5;font-size:11px}.card{background:linear-gradient(145deg,#111e2e,#0e1724);border:1px solid #273a52;border-radius:17px;padding:21px;box-shadow:0 15px 45px #0003}.login{max-width:450px;margin:9vh auto 0}.login h1{font-size:27px;margin:8px 0}.field{display:grid;gap:8px;margin:20px 0}.field label{color:#c4d3e5;font-weight:650;font-size:13px}.field input{background:#091421;border:1px solid #30445d;color:#fff;padding:13px 14px;border-radius:10px;outline:none}.field input:focus{border-color:var(--blue)}.btn{padding:10px 15px;border-radius:10px;border:0;background:linear-gradient(100deg,#2bd39d,#75b7ff);color:#06141d;font-weight:850;cursor:pointer}.btn.secondary{background:#192b41;border:1px solid #354b66;color:#d8e5f5}.btn:disabled{opacity:.5;cursor:wait}.error{color:#ff94a1;margin-top:12px;font-size:13px}.dashboard{display:none}.dashhead{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:18px 0 22px}.dashhead h1{margin:0;font-size:28px;letter-spacing:-.03em}.actions{display:flex;gap:9px;flex-wrap:wrap}.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:13px;margin:18px 0}.kpi{background:#101d2d;border:1px solid #293d55;border-radius:14px;padding:17px}.kpi label{color:var(--muted);font-size:12px}.kpi strong{display:block;font-size:28px;margin-top:4px;font-variant-numeric:tabular-nums}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.chartcard h3{margin:0 0 4px;font-size:15px}.chartwrap{height:255px;position:relative;margin-top:12px}.tablecard{margin-top:16px}.row-actions{display:flex;gap:6px;min-width:150px;margin-top:5px}.row-action{border:1px solid #3b526d;background:#142338;color:#c9d8ea;border-radius:7px;padding:6px 8px;font-size:11px;cursor:pointer;white-space:nowrap}.row-action.exclude{border-color:#8a6940;color:#ffd18a}.row-action.restore{border-color:#2c8064;color:#82e0bb}.row-action.delete{border-color:#8d3e4b;color:#ff9eaa;background:#321d29}.sample-flag{display:inline-block;border-radius:6px;padding:4px 7px;font-size:11px}.sample-flag.included{background:#14372e;color:#83e3c0}.sample-flag.excluded{background:#3a2b1c;color:#ffd18a}.section-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px}.section-head h2{font-size:17px;margin:0}.search{background:#091421;border:1px solid #30445d;color:#fff;border-radius:9px;padding:9px 12px;width:230px;max-width:50vw}.table-scroll{overflow:auto;border:1px solid #26384e;border-radius:12px}table{border-collapse:collapse;width:100%;min-width:900px;font-size:12px}th,td{text-align:left;padding:12px 13px;border-bottom:1px solid #223348;white-space:nowrap}th{background:#142338;color:#9fb4cc;font-weight:750;position:sticky;top:0}tbody tr{cursor:pointer}tbody tr:hover{background:#16263a}tbody tr:last-child td{border-bottom:0}.group{padding:4px 8px;border-radius:99px;font-size:11px}.group.human{background:#172f49;color:#91c4ff}.group.ai{background:#15352f;color:#79e7c0}.group-code{display:inline-block;padding:4px 8px;border-radius:8px;background:#1b2940;color:#c5d8f1;font-weight:800}.stats-card{margin-top:16px}.stats-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}.stats-metric{background:#0b1523;border:1px solid #26384e;border-radius:11px;padding:13px}.stats-metric label{display:block;color:var(--muted);font-size:11px}.stats-metric strong{display:block;font-size:20px;margin-top:4px}.stat-table{min-width:520px;margin-top:12px}.stat-table th,.stat-table td{padding:9px 11px}.stat-note{font-size:12px;color:#aabbd0;margin-top:10px}.stat-warning{color:#ffd18a}.stat-good{color:#7de2bb}.view{color:#75b7ff;text-decoration:underline;text-underline-offset:3px}.suggestion-content{white-space:pre-wrap;overflow-wrap:anywhere;min-width:300px;max-width:760px;color:#d9e8f8;line-height:1.7}.detail{margin-top:16px;display:none}.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.detail h3{margin:0 0 9px;font-size:14px}.detail pre{white-space:pre-wrap;word-break:break-word;background:#091421;border:1px solid #24364d;border-radius:10px;padding:13px;color:#bed0e5;font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;max-height:420px;overflow:auto}.empty{padding:35px;text-align:center;color:var(--muted)}.status{color:var(--muted);font-size:12px;margin-top:10px}.footer-note{margin-top:22px;border:1px solid #604b2d;background:#211c15;color:#c8b58f;border-radius:11px;padding:12px 14px;font-size:12px}
 @media(max-width:980px){.grid{grid-template-columns:1fr}.chartwrap{height:230px}.kpis{grid-template-columns:repeat(2,1fr)}.stats-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:620px){.wrap{width:calc(100% - 22px);padding-top:14px}.dashhead{align-items:flex-start;flex-direction:column}.kpis{gap:8px}.kpi{padding:13px}.kpi strong{font-size:23px}.stats-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.stats-metric{padding:10px}.stats-metric strong{font-size:17px}.section-head{align-items:flex-start;flex-direction:column}.search{width:100%;max-width:none}.detail-grid{grid-template-columns:1fr}.top .pill{display:none}}
 </style>
 </head>
@@ -27,14 +27,14 @@
 <main id="dashboard" class="dashboard">
  <div class="dashhead"><div><div class="sub">EXPERIMENT OVERVIEW</div><h1>数据总览</h1><div id="loadedAt" class="sub">等待加载数据库……</div></div><div class="actions"><button class="btn secondary" id="refreshBtn">↻ 刷新数据</button><button class="btn" id="exportBtn">↓ 导出 CSV</button><button class="btn secondary" id="logoutBtn">退出</button></div></div>
  <div id="loadStatus" class="status"></div>
- <section class="kpis"><div class="kpi"><label>有效样本</label><strong id="totalCount">—</strong></div><div class="kpi"><label>G1 · 人类顾问</label><strong id="g1Count">—</strong></div><div class="kpi"><label>G2 · 人类顾问</label><strong id="g2Count">—</strong></div><div class="kpi"><label>G3 · AI 系统</label><strong id="g3Count">—</strong></div><div class="kpi"><label>G4 · AI 系统</label><strong id="g4Count">—</strong></div><div class="kpi"><label>最近提交</label><strong id="lastSubmit" style="font-size:16px">—</strong></div></section>
+ <section class="kpis"><div class="kpi"><label>纳入统计的样本</label><strong id="totalCount">—</strong></div><div class="kpi"><label>异常样本（已排除）</label><strong id="excludedCount">—</strong></div><div class="kpi"><label>G1 · 人类顾问</label><strong id="g1Count">—</strong></div><div class="kpi"><label>G2 · 人类顾问</label><strong id="g2Count">—</strong></div><div class="kpi"><label>G3 · AI 系统</label><strong id="g3Count">—</strong></div><div class="kpi"><label>G4 · AI 系统</label><strong id="g4Count">—</strong></div><div class="kpi"><label>最近提交</label><strong id="lastSubmit" style="font-size:16px">—</strong></div></section>
  <section class="grid">
   <div class="card chartcard"><h3>四组责任归因分配</h3><div class="sub">本人、顾问、市场/运气承担比例均值（%）</div><div class="chartwrap"><canvas id="responsibilityChart"></canvas></div></div>
   <div class="card chartcard"><h3>四组责任转移感知</h3><div class="sub">责任转移量表 3 题均值（1–7 分）</div><div class="chartwrap"><canvas id="shiftChart"></canvas></div></div>
   <div class="card chartcard"><h3>四组信任感知</h3><div class="sub">能力、仁慈、诚信均值（1–7 分）</div><div class="chartwrap"><canvas id="trustChart"></canvas></div></div>
  </section>
  <section class="card stats-card"><div class="section-head"><div><h2>人类顾问 vs AI：责任转移的 χ² 独立性检验</h2><div class="sub">以责任转移均值相对量表中点 4 分分类：低于中点（&lt;4）、等于中点（=4）、高于中点（&gt;4）</div></div></div><div id="chiSummary" class="stats-note">等待数据加载……</div><div class="table-scroll"><table class="stat-table"><thead><tr><th>顾问类型</th><th>低于中点</th><th>等于中点</th><th>高于中点</th><th>合计</th></tr></thead><tbody id="chiTable"><tr><td colspan="5" class="empty">等待数据</td></tr></tbody></table></div><div id="chiNotes" class="stat-note">χ² 检验衡量组别与责任转移类别是否有关联；Cramér's V 用于描述关联强度。</div></section>
- <section class="card tablecard"><div class="section-head"><div><h2>参与者数据</h2><div class="sub">点击任意一行查看该被试的交易记录与顾问建议日志</div></div><input id="searchInput" class="search" placeholder="按被试编号筛选…"></div><div class="table-scroll"><table><thead><tr><th>Cookie 被试编号</th><th>四组编号</th><th>顾问类型</th><th>责任转移</th><th>能力</th><th>仁慈</th><th>诚信</th><th>未来信任</th><th>操纵检验</th><th>最终资产</th><th>提交时间</th><th>详情</th></tr></thead><tbody id="dataRows"><tr><td colspan="12" class="empty">尚未加载数据</td></tr></tbody></table></div><div id="rowCount" class="status"></div></section>
+ <section class="card tablecard"><div class="section-head"><div><h2>参与者数据</h2><div class="sub">点击任意一行查看该被试的交易记录与顾问建议日志</div></div><input id="searchInput" class="search" placeholder="按被试编号筛选…"></div><div class="table-scroll"><table><thead><tr><th>Cookie 被试编号</th><th>四组编号</th><th>顾问类型</th><th>责任转移</th><th>能力</th><th>仁慈</th><th>诚信</th><th>未来信任</th><th>操纵检验</th><th>最终资产</th><th>提交时间</th><th>样本状态</th><th>详情与管理</th></tr></thead><tbody id="dataRows"><tr><td colspan="13" class="empty">尚未加载数据</td></tr></tbody></table></div><div id="rowCount" class="status"></div></section>
  <section class="card tablecard"><div class="section-head"><div><h2>被试自由建议</h2><div class="sub">问卷结束时主动填写的意见与建议；点击记录可跳转至对应被试详情</div></div><span class="pill" id="suggestionCount">等待数据</span></div><div class="table-scroll"><table style="min-width:760px"><thead><tr><th>Cookie 被试编号</th><th>实验组</th><th>顾问类型</th><th>自由建议</th><th>提交时间</th></tr></thead><tbody id="suggestionRows"><tr><td colspan="5" class="empty">尚未加载数据</td></tr></tbody></table></div></section>
 <section class="card detail" id="detailPanel"><div class="section-head"><div><h2 id="detailTitle">被试详情</h2><div class="sub" id="detailMeta"></div></div><button class="btn secondary" id="closeDetail">关闭详情</button></div><div class="detail-grid"><div><h3>每日交易记录</h3><pre id="tradeDetail"></pre></div><div><h3>顾问建议日志</h3><pre id="adviceDetail"></pre></div><div><h3>完整聊天记录（含撤回事件）</h3><pre id="chatDetail"></pre></div><div><h3>被试自由建议</h3><pre id="suggestionDetail"></pre></div></div></section>
  <div class="footer-note">访问控制已启用：匿名被试端仅有提交权限；读取实验记录需要 Supabase Auth 登录，并且账户的 app_metadata.role 必须为 admin。请勿将管理员账号交给参与者使用。</div>
@@ -59,12 +59,12 @@ const GROUPS={
 };
 const GROUP_CODES=Object.keys(GROUPS);
 const $=id=>document.getElementById(id);
-let allRows=[],charts={};
+let allRows=[],analysisRows=[],charts={};
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fmt(v,d=2){return v==null||!Number.isFinite(Number(v))?'—':Number(v).toFixed(d)}
 function rowGroupCode(r){return GROUPS[r.group_code]?r.group_code:(r.group_type==='human'?'G1':'G3')}
-function groupRows(code){return allRows.filter(r=>rowGroupCode(r)===code)}
-function advisorRows(type){return allRows.filter(r=>r.group_type===type)}
+function groupRows(code){return analysisRows.filter(r=>rowGroupCode(r)===code)}
+function advisorRows(type){return analysisRows.filter(r=>r.group_type===type)}
 function avg(rows,key){
  const values=rows.filter(r=>r[key]!==null&&r[key]!==undefined&&r[key]!=='').map(r=>Number(r[key])).filter(Number.isFinite);
  return values.length?values.reduce((a,b)=>a+b,0)/values.length:null;
@@ -200,7 +200,7 @@ function monteCarloP(human,ai,observed,replicates=10000){
 }
 function pText(p){if(p===null||p===undefined)return'不可计算';if(p<.001)return'< 0.001';return p.toFixed(3)}
 function renderChiSquare(){
- const usable=allRows.filter(r=>r.responsibility_shift_mean!==null&&r.responsibility_shift_mean!==undefined&&Number.isFinite(Number(r.responsibility_shift_mean))&&(r.group_type==='human'||r.group_type==='ai'));
+ const usable=analysisRows.filter(r=>r.responsibility_shift_mean!==null&&r.responsibility_shift_mean!==undefined&&Number.isFinite(Number(r.responsibility_shift_mean))&&(r.group_type==='human'||r.group_type==='ai'));
  const human=[0,0,0],ai=[0,0,0];
  usable.forEach(r=>{const c=shiftCategory(r.responsibility_shift_mean);if(c===null)return;(r.group_type==='human'?human:ai)[c]++});
  const result=statisticFromCounts(human,ai);
@@ -243,11 +243,13 @@ async function loadData(){
  $('loadStatus').textContent='正在从 Supabase 分页读取全部记录……';$('refreshBtn').disabled=true;
  try{
   allRows=await fetchAll();
-  $('totalCount').textContent=allRows.length;
+  analysisRows=allRows.filter(r=>!r.is_excluded);
+  $('totalCount').textContent=analysisRows.length;
+  $('excludedCount').textContent=allRows.length-analysisRows.length;
   GROUP_CODES.forEach(code=>{$(code.toLowerCase()+'Count').textContent=groupRows(code).length});
   $('lastSubmit').textContent=allRows[0]?.created_at?new Date(allRows[0].created_at).toLocaleString('zh-CN'):'暂无';
   $('loadedAt').textContent='最近刷新：'+new Date().toLocaleString('zh-CN');
-  $('loadStatus').textContent='数据加载完成 · '+allRows.length+' 条记录 · G1–G4 四组';
+  $('loadStatus').textContent='数据加载完成 · '+allRows.length+' 条记录，其中 '+analysisRows.length+' 条纳入统计、'+(allRows.length-analysisRows.length)+' 条异常排除 · G1–G4 四组';
   renderCharts();renderChiSquare();renderRows();renderSuggestions();
  }catch(e){
   $('loadStatus').textContent=networkErrorText('读取实验数据失败（'+SUPABASE_URL+'/rest/v1/experiment_data）',e);
@@ -259,12 +261,23 @@ function renderRows(){
  const q=$('searchInput').value.trim().toLowerCase();
  const rows=allRows.filter(r=>String(r.subject_id||'').toLowerCase().includes(q)||rowGroupCode(r).toLowerCase().includes(q)||String(r.participant_suggestion||'').toLowerCase().includes(q));
  $('rowCount').textContent='显示 '+rows.length+' / '+allRows.length+' 条记录';
- if(!rows.length){$('dataRows').innerHTML='<tr><td colspan="12" class="empty">没有匹配记录</td></tr>';return}
+ if(!rows.length){$('dataRows').innerHTML='<tr><td colspan="13" class="empty">没有匹配记录</td></tr>';return}
  $('dataRows').innerHTML=rows.map(r=>{
   const code=rowGroupCode(r),advisor=r.group_type==='human'?'人类顾问':'AI 系统';
-  return '<tr data-id="'+esc(r.id)+'"><td><strong>'+esc(r.subject_id)+'</strong></td><td><span class="group-code">'+esc(code)+'</span></td><td><span class="group '+esc(r.group_type)+'">'+advisor+'</span></td><td>'+fmt(r.responsibility_shift_mean)+'</td><td>'+fmt(r.trust_ability_mean)+'</td><td>'+fmt(r.trust_benevolence_mean)+'</td><td>'+fmt(r.trust_integrity_mean)+'</td><td>'+fmt(r.future_trust_mean)+'</td><td>'+esc(r.manipulation_check||'—')+'</td><td>'+(r.final_assets==null?'—':'¥'+Number(r.final_assets).toLocaleString('zh-CN',{maximumFractionDigits:2}))+'</td><td>'+esc(r.created_at?new Date(r.created_at).toLocaleString('zh-CN'):'—')+'</td><td><span class="view">查看详情 →</span></td></tr>';
+  const excluded=!!r.is_excluded;
+  const flag=excluded?'<span class="sample-flag excluded" title="'+esc(r.exclusion_reason||'已被排除出统计')+'">异常 · 不纳入统计</span>':'<span class="sample-flag included">正常 · 纳入统计</span>';
+  const actions='<div class="row-actions"><button class="row-action '+(excluded?'restore':'exclude')+'" data-action="toggle">'+(excluded?'恢复纳入':'标记异常')+'</button><button class="row-action delete" data-action="delete">删除</button></div>';
+  return '<tr data-id="'+esc(r.id)+'"><td><strong>'+esc(r.subject_id)+'</strong></td><td><span class="group-code">'+esc(code)+'</span></td><td><span class="group '+esc(r.group_type)+'">'+advisor+'</span></td><td>'+fmt(r.responsibility_shift_mean)+'</td><td>'+fmt(r.trust_ability_mean)+'</td><td>'+fmt(r.trust_benevolence_mean)+'</td><td>'+fmt(r.trust_integrity_mean)+'</td><td>'+fmt(r.future_trust_mean)+'</td><td>'+esc(r.manipulation_check||'—')+'</td><td>'+(r.final_assets==null?'—':'¥'+Number(r.final_assets).toLocaleString('zh-CN',{maximumFractionDigits:2}))+'</td><td>'+esc(r.created_at?new Date(r.created_at).toLocaleString('zh-CN'):'—')+'</td><td>'+flag+'</td><td><span class="view" data-action="detail">查看详情</span>'+actions+'</td></tr>';
  }).join('');
- document.querySelectorAll('#dataRows tr[data-id]').forEach(tr=>tr.addEventListener('click',()=>showDetail(tr.dataset.id)));
+ document.querySelectorAll('#dataRows tr[data-id]').forEach(tr=>{
+  tr.addEventListener('click',()=>showDetail(tr.dataset.id));
+  tr.querySelectorAll('[data-action]').forEach(btn=>btn.addEventListener('click',event=>{
+   event.stopPropagation();
+   if(btn.dataset.action==='toggle')toggleSampleExclusion(tr.dataset.id);
+   else if(btn.dataset.action==='delete')deleteSample(tr.dataset.id);
+   else showDetail(tr.dataset.id);
+  }));
+ });
 }
 function renderSuggestions(){
  const q=$('searchInput').value.trim().toLowerCase();
@@ -288,12 +301,41 @@ function showDetail(id){
  $('adviceDetail').textContent=JSON.stringify({advice_log:adv},null,2);
  const chat=parseJSON(r.chat_log);$('chatDetail').textContent=JSON.stringify(Array.isArray(chat)?chat:[],null,2);
  $('suggestionDetail').textContent=String(r.participant_suggestion||'（未填写）');
+  if(r.is_excluded)$('detailMeta').textContent+=' · 异常样本（不纳入统计）'+(r.exclusion_reason?' · 原因：'+r.exclusion_reason:'');
  $('detailPanel').style.display='block';$('detailPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function toggleSampleExclusion(id){
+ const row=allRows.find(r=>String(r.id)===String(id));if(!row)return;
+ const next=!row.is_excluded;
+ let reason='';
+ if(next){
+  const entered=window.prompt('请简要填写标记该样本异常的原因（可留空，最多 1000 字）：',row.exclusion_reason||'');
+  if(entered===null)return;
+  reason=String(entered).trim().slice(0,1000);
+ }
+ try{
+  const {data:{session}}=await supabaseClient.auth.getSession();
+  const patch={is_excluded:next,exclusion_reason:next?reason:'',excluded_at:next?new Date().toISOString():null,excluded_by:next?(session?.user?.id||null):null};
+  const {error}=await supabaseClient.from('experiment_data').update(patch).eq('id',id);
+  if(error)throw error;
+  await loadData();
+ }catch(error){$('loadStatus').textContent='更新样本状态失败：'+(error.message||error)}
+}
+async function deleteSample(id){
+ const row=allRows.find(r=>String(r.id)===String(id));if(!row)return;
+ if(!window.confirm('确定永久删除被试 '+row.subject_id+' 的整条实验记录吗？此操作不可恢复。建议优先使用“标记异常”。'))return;
+ if(!window.confirm('再次确认：永久删除 '+row.subject_id+'？'))return;
+ try{
+  const {error}=await supabaseClient.from('experiment_data').delete().eq('id',id);
+  if(error)throw error;
+  $('detailPanel').style.display='none';
+  await loadData();
+ }catch(error){$('loadStatus').textContent='删除样本失败：'+(error.message||error)}
 }
 function csvCell(v){let s=typeof v==='object'&&v!==null?JSON.stringify(v):String(v??'');if(/^[\s]*[=+\-@]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'}
 function exportCSV(){
  if(!allRows.length){alert('当前没有可导出的数据。');return}
- const cols=['subject_id','group_code','group_type','participant_suggestion','daily_trades','chat_log','liability_self_percent','liability_advisor_percent','liability_market_percent','responsibility_shift_mean','trust_ability_mean','trust_benevolence_mean','trust_integrity_mean','future_trust_mean','manipulation_check','raw_answers','final_cash','final_shares','final_assets','created_at'];
+ const cols=['subject_id','group_code','group_type','is_excluded','exclusion_reason','excluded_at','excluded_by','participant_suggestion','daily_trades','chat_log','liability_self_percent','liability_advisor_percent','liability_market_percent','responsibility_shift_mean','trust_ability_mean','trust_benevolence_mean','trust_integrity_mean','future_trust_mean','manipulation_check','raw_answers','final_cash','final_shares','final_assets','created_at'];
  const lines=[cols.map(csvCell).join(',')];for(const r of allRows)lines.push(cols.map(k=>csvCell(r[k])).join(','));
  const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download='PychoExp_experiment_data_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
