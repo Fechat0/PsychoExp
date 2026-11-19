@@ -122,7 +122,7 @@ async function polishRationaleOnly(apiKey: string, group: GroupType, day: number
   const timeout = setTimeout(() => controller.abort(), 8000);
   try {
     const url = Deno.env.get("LLM_API_URL") ?? "https://api.deepseek.com/chat/completions";
-    const model = Deno.env.get("LLM_MODEL") ?? "deepseek-chat";
+    const model = "deepseek-flash";
     const style = group === "human" ? "券商高级分析师语气，专业、克制、自然。" : "AI 数据面板语气，极度理性、简洁、结构化。";
     const response = await fetch(url, {
       method: "POST",
@@ -166,7 +166,7 @@ async function generateConversationalReply(
   const timeout = setTimeout(() => controller.abort(), 9000);
   try {
     const url = Deno.env.get("LLM_API_URL") ?? "https://api.deepseek.com/chat/completions";
-    const model = Deno.env.get("LLM_MODEL") ?? "deepseek-chat";
+    const model = "deepseek-flash";
     const core = group === "human"
       ? String(scriptContext?.human_advice ?? SCRIPT[day - 1].human)
       : String(scriptContext?.ai_advice ?? SCRIPT[day - 1].ai);
@@ -285,8 +285,81 @@ function isAuthorizedPublishableKey(request: Request): boolean {
   return false;
 }
 
+
+async function isAdminRequest(request: Request): Promise<boolean> {
+  const authorization = request.headers.get("authorization") ?? "";
+  const apikey = request.headers.get("apikey") ?? "";
+  const projectUrl = Deno.env.get("SUPABASE_URL");
+  if (!authorization.startsWith("Bearer ") || !apikey || !projectUrl) return false;
+  try {
+    const response = await fetch(projectUrl + "/auth/v1/user", {
+      method: "GET",
+      headers: { "Authorization": authorization, "apikey": apikey, "Cache-Control": "no-store" },
+    });
+    if (!response.ok) return false;
+    const user = await response.json();
+    return user?.app_metadata?.role === "admin";
+  } catch (_error) {
+    return false;
+  }
+}
+
+async function testDeepSeekConnection(): Promise<Record<string, unknown>> {
+  const started = Date.now();
+  const apiKey = await resolveLLMApiKey();
+  if (!apiKey) {
+    return { ok: false, stage: "key_resolution", message: "服务端未能读取 DeepSeek API 密钥。", latency_ms: Date.now() - started };
+  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
+  try {
+    const apiUrl = Deno.env.get("LLM_API_URL") ?? "https://api.deepseek.com/chat/completions";
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      signal: controller.signal,
+      headers: { "Authorization": "Bearer " + apiKey, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "deepseek-flash",
+        thinking: { type: "disabled" },
+        temperature: 0,
+        max_tokens: 8,
+        messages: [{ role: "user", content: "Reply with exactly OK." }],
+      }),
+    });
+    const latency = Date.now() - started;
+    if (!response.ok) {
+      return {
+        ok: false,
+        stage: "deepseek_api",
+        message: "DeepSeek API 返回非成功状态。",
+        upstream_status: response.status,
+        latency_ms: latency,
+      };
+    }
+    const result = await response.json();
+    const content = result?.choices?.[0]?.message?.content;
+    return {
+      ok: typeof content === "string" && content.trim().length > 0,
+      stage: "deepseek_api",
+      model: result?.model ?? "deepseek-flash",
+      latency_ms: latency,
+      reply_received: typeof content === "string" && content.trim().length > 0,
+      total_tokens: result?.usage?.total_tokens ?? null,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      stage: "deepseek_api",
+      message: error instanceof Error && error.name === "AbortError" ? "DeepSeek API 请求超时。" : "无法连接 DeepSeek API。",
+      latency_ms: Date.now() - started,
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 Deno.serve(async (request: Request) => {
-  if (request.method === "OPTIONS") return new Response("ok", { status: 200, headers: corsHeaders });
+  if (request.method === "OPTIONS")  if (request.method === "OPTIONS") return new Response("ok", { status: 200, headers: corsHeaders });
   if (request.method !== "POST") return jsonResponse(405, { ok: false, error: "Method not allowed" });
   if (!isAuthorizedPublishableKey(request)) {
     return jsonResponse(401, { ok: false, error: "A valid project publishable API key is required in the apikey header." });
@@ -294,6 +367,12 @@ Deno.serve(async (request: Request) => {
 
   try {
     const body = await request.json();
+    if (body?.mode === "healthcheck") {
+      if (!(await isAdminRequest(request))) {
+        return jsonResponse(403, { ok: false, error: "Administrator access required." });
+      }
+      return jsonResponse(200, await testDeepSeekConnection());
+    }
     const group = body?.group_type as GroupType;
     const day = Number(body?.day_index);
     if (group !== "human" && group !== "ai") {
