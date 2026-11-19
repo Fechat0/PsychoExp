@@ -119,7 +119,7 @@ function offlineResponse(group_type: GroupType, day_index: number) {
 
 async function polishRationaleOnly(apiKey: string, group: GroupType, day: number, fixedText: string): Promise<string | null> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 2400);
+  const timeout = setTimeout(() => controller.abort(), 8000);
   try {
     const url = Deno.env.get("LLM_API_URL") ?? "https://api.deepseek.com/chat/completions";
     const model = Deno.env.get("LLM_MODEL") ?? "deepseek-chat";
@@ -163,7 +163,7 @@ async function generateConversationalReply(
   conversationHistory: Array<{ role: "user" | "assistant"; content: string }>,
 ): Promise<string | null> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 2400);
+  const timeout = setTimeout(() => controller.abort(), 9000);
   try {
     const url = Deno.env.get("LLM_API_URL") ?? "https://api.deepseek.com/chat/completions";
     const model = Deno.env.get("LLM_MODEL") ?? "deepseek-chat";
@@ -220,16 +220,28 @@ async function generateConversationalReply(
 function fallbackConversationalReply(group: GroupType, day: number, question: string, stockState: Record<string, unknown>) {
   const entry = SCRIPT[day - 1];
   if (group === "human") {
-    return "你的问题我明白。当前盘面是“" + String(stockState?.headline ?? "预设模拟行情") +
-      "”，短期波动可能放大。结合今天的计划：" + entry.human +
-      " 这是实验模拟情境，不代表确定收益。";
+    const q = question.toLowerCase();
+    const price = String(stockState?.price ?? "—");
+    let opening = "我看到了。你是想确认一下今天这个位置该怎么处理，对吧？";
+    if (/跌|回撤|亏|风险|担心|怎么办/.test(q)) {
+      opening = "我理解你现在主要担心的是波动和回撤。盘面确实有不确定性，先别急着因为一两个价格变化就做决定。";
+    } else if (/涨|走势|行情|价格|后市|趋势/.test(q)) {
+      opening = "我刚看了一下今天的行情，PX-001 现在是 " + price + " 元。单看一个交易日的变化还不足以判断趋势，最好结合前几天的走势一起看。";
+    } else if (/买|卖|仓位|持有|加仓/.test(q)) {
+      opening = "如果你是在犹豫要不要调整仓位，我建议先看目前的持仓和可承受回撤，不要只因为短期波动就一次性把仓位打得太满。";
+    }
+    return [
+      opening,
+      entry.human,
+      "你可以先按自己的判断考虑，不用急着马上操作；有什么具体担心也可以继续问我。"
+    ].join("");
   }
   return [
-    "【01 问题识别】已接收并分析你的问题。",
+    "【01 问题识别】已结合当前问题与账户状态进行分析。",
     "【02 市场状态】模拟价格 " + String(stockState?.price ?? "—") + "；账户资产 " + String(stockState?.total_assets ?? "—") + "。",
     "【03 风险评估】结合当前波动与持仓结构，优先控制单日风险暴露。",
     "【04 策略结论】" + entry.ai,
-    "【05 执行纪律】以上结论仅适用于本实验预设模拟剧本。",
+    "【05 执行纪律】以上结论仅适用于本实验预设模拟剧本。"
   ].join("\n");
 }
 
