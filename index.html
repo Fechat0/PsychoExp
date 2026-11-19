@@ -480,11 +480,9 @@ function fallbackChatReply(question){
    return [first,second,third].join('');
   }
   return [
-   '【01 问题识别】已接收你的提问：“'+String(question).slice(0,46)+'”',
-   '【02 市场状态】'+s.trend+'；模拟最新价格 '+MARKET[state.day_index].price.toFixed(2)+' 元；账户资产 '+asset().toFixed(2)+' 元。',
-   '【03 风险评估】结合当前波动与持仓结构，优先控制单日风险暴露。',
-   '【04 策略结论】'+s.ai,
-   '【05 执行纪律】严格控制风险，以上判断仅供参考。'
+   '【市场信号】'+s.ai,
+   '【结合你的账户】PX-001 当前价格 '+MARKET[state.day_index].price.toFixed(2)+' 元，账户总资产约 '+asset().toFixed(2)+' 元。',
+   '【操作提醒】建议按步骤执行，不要因为短期涨跌临时改变计划；仓位和风险要与你能承受的波动相匹配。'
   ].join('\n');
 }
 
