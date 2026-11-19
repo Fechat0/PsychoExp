@@ -25,8 +25,8 @@
  </form>
 </section>
 <main id="dashboard" class="dashboard">
- <div class="dashhead"><div><div class="sub">EXPERIMENT OVERVIEW</div><h1>数据总览</h1><div id="loadedAt" class="sub">等待加载数据库……</div></div><div class="actions"><button class="btn secondary" id="refreshBtn">↻ 刷新数据</button><button class="btn" id="exportBtn">↓ 导出 CSV</button><button class="btn secondary" id="logoutBtn">退出</button></div></div>
- <div id="loadStatus" class="status"></div>
+ <div class="dashhead"><div><div class="sub">EXPERIMENT OVERVIEW</div><h1>数据总览</h1><div id="loadedAt" class="sub">等待加载数据库……</div></div><div class="actions"><button class="btn secondary" id="deepseekTestBtn">检测 DeepSeek API</button><button class="btn secondary" id="refreshBtn">↻ 刷新数据</button><button class="btn" id="exportBtn">↓ 导出 CSV</button><button class="btn secondary" id="logoutBtn">退出</button></div></div>
+ <div id="loadStatus" class="status"></div><div id="deepseekTestStatus" class="status">DeepSeek API 尚未检测</div>
  <section class="kpis"><div class="kpi"><label>纳入统计的样本</label><strong id="totalCount">—</strong></div><div class="kpi"><label>异常样本（已排除）</label><strong id="excludedCount">—</strong></div><div class="kpi"><label>G1 · 人类顾问</label><strong id="g1Count">—</strong></div><div class="kpi"><label>G2 · 人类顾问</label><strong id="g2Count">—</strong></div><div class="kpi"><label>G3 · AI 系统</label><strong id="g3Count">—</strong></div><div class="kpi"><label>G4 · AI 系统</label><strong id="g4Count">—</strong></div><div class="kpi"><label>最近提交</label><strong id="lastSubmit" style="font-size:16px">—</strong></div></section>
  <section class="grid">
   <div class="card chartcard"><h3>四组责任归因分配</h3><div class="sub">本人、顾问、市场/运气承担比例均值（%）</div><div class="chartwrap"><canvas id="responsibilityChart"></canvas></div></div>
@@ -129,6 +129,24 @@ supabaseClient.auth.onAuthStateChange((event)=>{
  }
 })();
 $('refreshBtn').onclick=loadData;
+$('deepseekTestBtn').onclick=async()=>{
+ const button=$('deepseekTestBtn'),status=$('deepseekTestStatus');
+ button.disabled=true;status.className='status';status.textContent='正在通过服务端向 DeepSeek 发送最小测试请求……';
+ try{
+  const {data,error}=await supabaseClient.functions.invoke('generate-advice',{body:{mode:'healthcheck'}});
+  if(error)throw error;
+  if(data?.ok){
+   status.className='status stat-good';
+   status.textContent='连接正常 · '+(data.model||'deepseek-flash')+' · '+data.latency_ms+' ms · '+(data.total_tokens??'—')+' tokens';
+  }else{
+   status.className='status stat-warning';
+   status.textContent='连接检测失败 · 阶段：'+(data?.stage||'unknown')+' · '+(data?.message||data?.error||'未获得有效模型回复')+(data?.upstream_status?' · HTTP '+data.upstream_status:'');
+  }
+ }catch(error){
+  status.className='status stat-warning';
+  status.textContent='连接检测失败：'+(error?.message||String(error));
+ }finally{button.disabled=false}
+};
 $('closeDetail').onclick=()=>{$('detailPanel').style.display='none'};
 $('searchInput').addEventListener('input',()=>{renderRows();renderSuggestions()});
 function chartOptions(max){
