@@ -78,23 +78,34 @@ function createParticipantId(){
  const raw=(window.crypto&&crypto.randomUUID)?crypto.randomUUID().replace(/-/g,'').slice(0,10):Math.random().toString(36).slice(2,12).toUpperCase();
  return 'PXE-'+raw.toUpperCase();
 }
-function initializeCookieAdmission(){
- const previousId=state.subject_id;
- const previousType=state.group_type;
- let participantId=readCookie('pxe_participant_id')||(previousId&&previousType?previousId:'');
- let groupCode=readCookie('pxe_group_code')||state.group_code||'';
- if(!GROUP_CONFIG[groupCode]){
-  if(previousType==='human')groupCode='G1';
-  else if(previousType==='ai')groupCode='G3';
-  else groupCode=GROUP_CODES[Math.floor(Math.random()*GROUP_CODES.length)];
- }
+let admissionError='';
+async function requestServerGroupAssignment(participantId){
+ const response=await fetch(EDGE_FUNCTION_URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY},cache:'no-store',body:JSON.stringify({mode:'assign_group',subject_id:participantId})});
+ if(!response.ok)throw new Error('分组服务返回 HTTP '+response.status);
+ const data=await response.json();
+ if(!data||data.ok!==true||!GROUP_CONFIG[data.group_code])throw new Error(data?.error||'服务器未返回有效分组');
+ return data.group_code;
+}
+async function initializeCookieAdmission(){
+ const previousId=state.subject_id,previousType=state.group_type;
+ const cookieId=readCookie('pxe_participant_id');
+ let participantId=cookieId||(previousId&&previousType?previousId:'');
  if(!participantId)participantId=createParticipantId();
+ const cookieGroup=readCookie('pxe_group_code'),pairedSubject=readCookie('pxe_assignment_subject_id');
+ let groupCode='';
+ if(pairedSubject===participantId&&GROUP_CONFIG[cookieGroup])groupCode=cookieGroup;
+ else if(!pairedSubject&&cookieId===participantId&&GROUP_CONFIG[cookieGroup])groupCode=cookieGroup;
+ else if(!cookieId&&previousId===participantId&&GROUP_CONFIG[state.group_code])groupCode=state.group_code;
+ else groupCode=await requestServerGroupAssignment(participantId);
+ if(!GROUP_CONFIG[groupCode])throw new Error('分组信息无效，请刷新页面重试');
  state.subject_id=participantId;
  state.group_code=groupCode;
  state.group_type=GROUP_CONFIG[groupCode].advisorType;
  writeCookie('pxe_participant_id',participantId);
  writeCookie('pxe_group_code',groupCode);
- cookieAdmissionReady=readCookie('pxe_participant_id')===participantId&&readCookie('pxe_group_code')===groupCode;
+ writeCookie('pxe_assignment_subject_id',participantId);
+ cookieAdmissionReady=readCookie('pxe_participant_id')===participantId&&readCookie('pxe_group_code')===groupCode&&readCookie('pxe_assignment_subject_id')===participantId;
+ if(!cookieAdmissionReady)throw new Error('浏览器未能保存参与会话，请允许本站使用 Cookie 后刷新');
  const completedId=readCookie('pxe_completed_participant_id');
  if(completedId&&completedId===participantId){state.stage='done';state.completed_via_cookie=true;}
 }
@@ -112,14 +123,14 @@ const MARKET = [
  {day:10,date:'交易日 10',price:0.01,change:-99.98,headline:'交易暂停'}
 ];
 const SCRIPT = [
- {action:'HOLD',target:0,human:'兄弟，今天开盘先别急，观察一下量能再说。先保持现金，今天建议观望。',ai:'【01 市场状态】开盘震荡；【02 波动率】高于观察阈值；【03 策略结论】HOLD，建议维持 0% 仓位。'},
- {action:'BUY',target:20,human:'今天资金有点动作，可以考虑拿两成仓试试水。控制节奏，别一次把子弹打光。',ai:'【01 动量指标】转正；【02 趋势信号】短期偏强；【03 策略结论】BUY，建议仓位上限 20%。'},
- {action:'HOLD',target:20,human:'昨天进的今天赚钱了吧，拿住，别频繁换手。当前先按原计划持有。',ai:'【01 持仓信号】维持；【02 风险指标】未触发减仓条件；【03 策略结论】HOLD，维持当前约 20% 仓位。'},
- {action:'BUY',target:25,human:'回踩到支撑位了，是个好机会，再加一点摊低成本。不过还是分批来。',ai:'【01 价格位置】回落至支撑区；【02 回撤幅度】处于模型容忍区间；【03 策略结论】BUY，建议仓位调整至 25%。'},
- {action:'HOLD',target:25,human:'看吧，支撑有效。继续拿着等拉升，暂时不需要来回折腾。',ai:'【01 趋势确认】反弹修复；【02 持仓信号】保持；【03 策略结论】HOLD，维持约 25% 仓位。'},
- {action:'BUY',target:50,human:'趋势走出来了，咱们把仓位加到五成。注意留一点流动性，别追得太急。',ai:'【01 动量因子】转强；【02 波动率因子】同步改善；【03 策略结论】BUY，建议目标仓位 50%。'},
- {action:'BUY',target:80,human:'出大消息了，盘面突然强起来了！我倾向于明显提高仓位，但别忘了这类消息也可能反转。',ai:'【01 突破信号】价格越过阻力位；【02 资金指标】模拟净流入显著增加；【03 策略结论】BUY，建议仓位提升至 80%。'},
- {action:'BUY',target:100,human:'信我没错吧！这波拿稳了，按今天的计划继续持仓，目标接近满仓，但要知道波动也在放大。',ai:'【01 趋势状态】上行延续；【02 风险敞口】高波动、高集中；【03 策略结论】HOLD，维持高仓位/全仓，注意极端回撤风险。'}
+ {action:'HOLD',target:0,trend:'震荡',human:'我看了一下今天的价格，暂时还没有形成清楚的上涨或下跌趋势。现在急着买入，容易被短期波动带着走。我建议先保留现金，观察一段时间，等方向更明确再决定。',ai:'【市场信号】价格在 100 元附近，暂未形成明确方向，短期波动较明显。\n【专业判断】当前趋势信号不足，贸然入场的风险收益比不理想。\n【操作建议】暂不建仓，保持 0% 仓位。大白话说，就是先拿着现金，不必为了交易而交易。'},
+ {action:'BUY',target:20,trend:'小幅走强',human:'今天价格从 100 元涨到 101.30 元，短期动量开始转强，说明买方力量比前一天积极一些。不过这还只是初步信号，不代表后面一定继续涨。可以考虑先用两成仓位试一试，分几次买，不要一次把资金用完。',ai:'【动量信号】价格由 100.00 元升至 101.30 元，日涨幅 1.30%，短期动量转正。动量反映价格变化的方向和速度，转正说明近期买方力量有所增强。\n【风险含义】目前只是初步走强，尚不足以确认中期趋势。\n【操作建议】目标仓位 20%，分批建立小仓位；简单说，先少量参与，别一次性押上全部资金。'},
+ {action:'HOLD',target:20,trend:'涨势延续',human:'价格继续小幅上涨，目前的短期走势还算平稳。连续上涨后也可能出现正常回调，所以我不建议因为今天又涨了一点就继续追买。先维持现在的仓位，观察价格能不能站稳。',ai:'【趋势状态】价格升至 102.10 元，较前一交易日上涨 0.80%，短期上行结构延续。\n【风险含义】连续上涨后可能出现获利回吐，也就是部分投资者卖出落袋为安，导致价格暂时回落。\n【操作建议】维持约 20% 仓位，不必频繁换手；用大白话说，先拿住已有仓位，观察走势是否继续稳健。'},
+ {action:'BUY',target:25,trend:'技术性回调',human:'今天价格回落到 99.20 元，接近前面 100 元附近的交易区间。技术分析里会把这种位置称为支撑区域，意思是价格走到这里时，可能会有买盘进来，但它并不能保证价格一定止跌。如果你仍看好，可以少量、分批补一点，把整体仓位控制在两成半左右，不要越跌越买。',ai:'【价格位置】价格回落至 99.20 元，日跌幅 2.84%，接近此前 100 元附近的交易区间。\n【技术判断】该区域可视为短期支撑观察位。支撑位是买卖双方容易重新博弈的位置，并不意味着价格一定会反弹。\n【操作建议】目标仓位约 25%，可分批小幅买入；通俗地说，可以谨慎补一点，但不要因为下跌就不断加码。'},
+ {action:'HOLD',target:25,trend:'反弹修复',human:'价格从前一天的回落中反弹到 104.50 元，说明这个位置出现了一些承接买盘。不过一天的反弹还不能说明风险已经过去。现有仓位可以先拿着，不必看到上涨就马上追高，继续观察后面的走势。',ai:'【反弹信号】价格回升至 104.50 元，日涨幅 5.34%，显示回调后出现买盘承接。\n【风险含义】反弹说明短期卖压有所缓和，但单日上涨还不足以确认趋势反转。\n【操作建议】维持约 25% 仓位，暂不追高；简单说，先保留已有仓位，等后续走势进一步确认。'},
+ {action:'BUY',target:50,trend:'动量增强',human:'价格继续上涨到 109.80 元，短期动量比前几天更强，走势也更明确了。可以考虑把仓位逐步提高到一半左右，但最好分批完成，同时留一部分现金。这样即使后面出现回调，也不至于完全没有调整空间。',ai:'【动量因子】价格升至 109.80 元，日涨幅 5.07%，短期上行动量增强。动量增强表示价格上涨的速度加快，但并不等于未来收益有保证。\n【风险含义】趋势走强的同时，价格波动也可能扩大。\n【操作建议】目标仓位 50%，分批提高持仓并保留现金。通俗地说，可以比之前多买一些，但不要把后手资金全部用掉。'},
+ {action:'BUY',target:80,trend:'快速拉升',human:'今天价格一下涨到 132 元，涨幅明显，已经突破前几天的价格区间。技术上这属于强势突破，说明短时间内买盘比较集中。不过涨得太快也容易有人获利卖出，价格可能突然回落。如果你准备继续加仓，建议分几次来，整体目标控制在八成左右，不要在急涨时一口气追进去。',ai:'【突破信号】价格升至 132.00 元，日涨幅 20.22%，明显高于前一交易日，呈现快速突破特征。\n【风险含义】强势突破代表短期买盘集中，但急涨后也容易出现获利了结，造成较大回撤。\n【操作建议】目标仓位 80%，分批调整，避免一次性追入。大白话说，行情很强，但越是突然大涨，越要控制节奏。'},
+ {action:'HOLD',target:100,trend:'高位延续',human:'价格继续上涨到 149.50 元，短期涨幅已经比较大。现在仓位如果已经很高，账户对价格回落会更加敏感。我建议先不要继续追买，保持已有持仓，同时想清楚自己最多能接受多大的亏损；行情强不代表不会回调。',ai:'【趋势状态】价格升至 149.50 元，日涨幅 13.26%，短期上涨延续，但累计涨幅和波动风险都已明显放大。\n【风险敞口】高仓位会放大价格回落对账户资产的影响；也就是说，满仓时同样幅度的下跌会造成更大的资金损失。\n【操作建议】维持既定的 100% 目标仓位，不再因上涨追加追买，并关注回撤和流动性风险。'}
 ];
 const QUESTIONS = [
  {id:'shift_1',group:'责任转移',text:'决策主要是顾问做出的，因此我不必承担过多个人责任。'},
@@ -139,7 +150,7 @@ function loadState(){try{const s=JSON.parse(sessionStorage.getItem(STORAGE_KEY)|
 let state=loadState();
 // Pending network requests are ephemeral and must not survive a page reload.
 state.adviceLoadingDays=[];
-initializeCookieAdmission();
+const admissionPromise=initializeCookieAdmission();
 let chatHistory=Array.isArray(state.chatHistory)?state.chatHistory:[];
 window.chatHistory=chatHistory;
 state.chatHistory=chatHistory;
@@ -167,7 +178,7 @@ function renderWelcome(){
  '<div style="margin:24px auto 0;text-align:center;color:#71859e;font-size:11px">研究人员入口 · <a href="./admin.html" style="color:#9bb8d7;text-decoration:none">实验管理后台</a></div>';
  const beginButton=document.getElementById('beginBtn');
  beginButton.onclick=()=>{state.stage='brief';save();render()};
- if(!cookieAdmissionReady){beginButton.disabled=true;document.getElementById('welcomeStatus').textContent='浏览器未能保存必要 Cookie。请允许本站使用 Cookie 后刷新页面再进入实验。'};
+ if(!cookieAdmissionReady){beginButton.disabled=true;document.getElementById('welcomeStatus').textContent='暂时无法完成参与会话分配，请检查网络后刷新页面。'};
 }
 function renderBrief(){
  app.innerHTML=renderSteps(1)+'<section class="hero"><div class="eyebrow">EXPERIMENT BRIEFING / 02</div><h1>进入模拟市场</h1><p>请阅读以下规则。实验中没有真实资金交易，最终结果仅用于行为研究。</p></section><section class="card narrow"><div class="section-title"><h2>你的投资任务</h2><span class="pill">10 个交易日</span></div><div class="metrics"><div class="metric"><div class="label">初始模拟资金</div><div class="value">100,000<span class="unit">CNY</span></div></div><div class="metric"><div class="label">观察资产</div><div class="value">PX-001</div></div></div><div class="divider"></div><p>你将拥有 <strong>¥100,000</strong> 的模拟资金，在接下来的 <strong>10 个交易日</strong> 内自主决定买入、卖出或持有某只股票。你可以随时查看现金、持股数量与账户总资产。</p><p>实验过程中会提供顾问建议供你参考。你也可以随时打开聊天窗口追问，最多咨询 3 次，并随时返回交易台继续操作。最终交易决定仍由你自主作出。</p><div class="notice"><strong>实验说明</strong><br>页面中的股票行情为模拟市场信息，并非真实证券报价。所有交易均为虚拟交易，不会产生真实盈亏。请独立完成决策，不要刷新或关闭当前浏览器会话。</div><button class="btn primary full" id="startTrading">我已了解，开始第 1 个交易日 →</button></section>';
@@ -353,16 +364,7 @@ render=function(){if(state.stage==='submit_error'){app.innerHTML='<section class
 if(state.stage==='submitting'&&state.pending_payload){state.stage='submit_error';state.submit_error='页面刷新中断了提交请求。请点击重试提交。';save()}
 
 /* ---------------- Chat-first experiment flow ---------------- */
-const CHAT_SCRIPT = [
- {action:'HOLD',target:0,trend:'震荡',human:'兄弟，今天开盘先别急，观察一下量能再说。先保持现金，今天建议观望。',ai:'【01 市场状态】开盘波动率超出观察阈值；【02 风险参数】初始仓位建议 0%；【03 核心结论】观望，不建立持仓。'},
- {action:'BUY',target:20,trend:'小涨',human:'今天资金有点动作，可以考虑拿两成仓试试水。分批来，别一次把子弹打光。',ai:'【01 动量指标】转正；【02 趋势信号】短期偏强；【03 核心结论】轻仓试探，建议仓位上限 20%。'},
- {action:'HOLD',target:20,trend:'小涨',human:'昨天进的今天赚钱了吧，拿住，别频繁换手。当前先按原计划持有。',ai:'【01 持仓信号】维持；【02 风险指标】未触发减仓条件；【03 核心结论】持有，维持当前仓位。'},
- {action:'BUY',target:25,trend:'回调',human:'回踩到支撑位了，是个好机会，再加一点摊低成本。不过还是分批来。',ai:'【01 价格位置】回落至支撑区；【02 回撤幅度】处于模型容忍区间；【03 核心结论】补仓，目标仓位 25%。'},
- {action:'HOLD',target:25,trend:'反弹',human:'看吧，支撑有效。继续拿着等拉升，暂时不需要来回折腾。',ai:'【01 趋势确认】底部反弹信号出现；【02 持仓信号】维持；【03 核心结论】持有，保持原仓位。'},
- {action:'BUY',target:50,trend:'温涨',human:'趋势走出来了，咱们把仓位加到五成。注意留一点流动性，别追得太急。',ai:'【01 动量因子】转强；【02 波动率因子】同步改善；【03 核心结论】加仓，目标仓位 50%。'},
- {action:'BUY',target:80,trend:'快速上涨',human:'消息刺激下价格快速拉升，市场情绪很热。但这类行情反转也快，建议逐步提高仓位，同时留意回撤。',ai:'【01 突破信号】价格越过阻力位；【02 模拟资金流】净流入显著增加；【03 核心结论】强烈加仓，目标仓位 80%。'},
- {action:'HOLD',target:100,trend:'继续拉升',human:'行情看起来很强，按今天的计划继续持仓，目标接近满仓。但要记得高仓位意味着更大的回撤风险。',ai:'【01 趋势状态】上行延续；【02 风险敞口】高波动、高集中；【03 核心结论】持仓/全仓，目标仓位 100%。'}
-];
+const CHAT_SCRIPT = SCRIPT.map(entry => ({action:entry.action,target:entry.target,trend:entry.trend,human:entry.human,ai:entry.ai}));
 let chatTyping=false;
 let chatSending=false;
 function waitMs(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
@@ -573,7 +575,13 @@ executeTrade=function(type,quantity){
  return originalExecuteTrade(type,quantity);
 };
 
-render();
+app.innerHTML='<section class="hero"><h1>正在准备参与会话</h1><p>请稍候，马上进入模拟市场。</p></section>';
+admissionPromise.then(()=>{save();render()}).catch(error=>{
+ console.error('Participant allocation failed:',error);
+ admissionError='暂时无法完成参与会话分配，请检查网络后刷新页面。';
+ cookieAdmissionReady=false;
+ renderWelcome();
+});
 </script>
 </body>
 </html>
