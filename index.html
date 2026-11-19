@@ -322,7 +322,7 @@ async function submitSurvey(){
  const missing=QUESTIONS.filter(q=>!state.answers[q.id]);const status=document.getElementById('surveyStatus');
  if(countSuggestionWords(state.participant_suggestion)>70){status.textContent='自由建议超过 70 词，请适当精简后再提交。';status.className='status error';document.getElementById('participantSuggestion')?.focus();return}
  if(missing.length){status.textContent='还有 '+missing.length+' 道量表题未回答，请检查并补充。';status.className='status error';const el=document.querySelector('[name="'+missing[0].id+'"]');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});return}
- if(!state.manipulation_check){status.textContent='请完成操纵检验单选题。';status.className='status error';return}
+ if(!state.manipulation_check){status.textContent='请完成顾问类型选择题。';status.className='status error';return}
  if(Object.values(state.liability).reduce((a,b)=>a+b,0)!==100){status.textContent='责任分配总和必须为 100%。';status.className='status error';return}
  state.pending_payload=buildPayload();state.stage='submitting';save();render();await sendPayload();
 }
