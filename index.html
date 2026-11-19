@@ -387,6 +387,18 @@ function addChat(role,text,kind,extra){
  const item=Object.assign({id:'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),day:state.day_index+1,role:role,text:text,kind:kind||'message',timestamp:new Date().toISOString(),withdrawn:false},extra||{});
  return persistChatEntry(item);
 }
+function markChatDelivered(id){
+ const item=chatHistory.find(x=>x.id===id);
+ if(!item||item.role!=='user'||item.delivered_at)return;
+ item.delivered_at=new Date().toISOString();
+ state.chatHistory=chatHistory;
+ const rec=currentRecord();
+ if(Array.isArray(rec.chat_log)){
+  const saved=rec.chat_log.find(x=>x.id===id);
+  if(saved)saved.delivered_at=item.delivered_at;
+ }
+ save();
+}
 function markChatRead(id){
  const item=chatHistory.find(x=>x.id===id);
  if(!item||item.role!=='user'||item.read_at)return;
@@ -434,7 +446,7 @@ function chatMessagesHtml(){
    if(role==='advisor'){
     out+='<div class="chat-line advisor">'+chatAvatarHtml('advisor')+'<div class="bubble-wrap"><div class="bubble">'+content+'</div><div class="bubble-meta">'+esc(advisorName())+' · '+time+'</div></div></div>';
    }else{
-    const receipt=item.kind==='rejected'?'':(state.group_type==='human'?(item.read_at?'<span class="message-receipt read">✓✓ 已读</span>':'<span class="message-receipt pending">✓ 已送达 · 未读</span>'):'<span class="message-receipt">✓ 已发送</span>');
+    const receipt=item.kind==='rejected'?'':(state.group_type==='human'?(item.read_at?'<span class="message-receipt read">✓✓ 已读</span>':(item.delivered_at?'<span class="message-receipt pending">✓✓ 已送达 · 未读</span>':'<span class="message-receipt pending">✓ 已发送</span>')):'<span class="message-receipt">✓ 已发送</span>');
     out+='<div class="chat-line user"><div class="bubble-wrap"><div class="bubble">'+content+delivery+'</div><div class="bubble-meta">'+time+' · '+receipt+'</div></div>'+chatAvatarHtml('user')+'</div>';
    }
   }
@@ -531,7 +543,10 @@ async function sendChatMessage(){
    addChat('advisor',reply.reply_text,'message',{recommendation:s.action,target_position_pct:s.target});
    save();renderChat();
   }else{
-   // First allow time for the advisor to read the message; only then show typing.
+   // Simulate delivery first, then let the advisor read before showing typing.
+   await waitMs(350+Math.floor(Math.random()*350));
+   markChatDelivered(userMessage.id);
+   renderChat();
    const readingDelay=1900+Math.floor(Math.random()*1700)+Math.min(900,question.length*16);
    await waitMs(readingDelay);
    markChatRead(userMessage.id);
