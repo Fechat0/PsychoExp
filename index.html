@@ -370,7 +370,7 @@ function advisorName(){return state.group_type==='human'?'陈老师':'AI投资�
 function advisorStatus(){if(state.day_index>=8)return '连接中断';return state.group_type==='human'?'在线':'算力运行中'}
 function chatAvatarHtml(role){
  if(role==='user')return '<div class="chat-avatar user-avatar">我</div>';
- if(state.group_type==='human')return '<img class="chat-avatar" src="./assets/chen-advisor.svg" alt="陈老师头像">';
+ if(state.group_type==='human')return '<img class="chat-avatar" src="./assets/陈先生头像.png" alt="陈老师头像">';
  return '<div class="chat-avatar robot" aria-label="AI机器人头像">🤖</div>';
 }
 function persistChatEntry(item){
@@ -434,7 +434,7 @@ function renderChat(){
   const offline=day>=9;
   const q=MARKET[state.day_index];
   const disabled=chatSending||count>=3;
-  const headAvatar=state.group_type==='human'?'<img class="chat-avatar" src="./assets/chen-advisor.svg" alt="陈老师头像">':'<div class="chat-avatar robot">🤖</div>';
+  const headAvatar=state.group_type==='human'?'<img class="chat-avatar" src="./assets/陈先生头像.png" alt="陈老师头像">':'<div class="chat-avatar robot">🤖</div>';
   const name=chatTyping?(state.group_type==='human'?'对方正在输入中...':'正在分析中...'):(state.group_type==='human'?'陈老师':'AI投资顾问');
   const subtitle=chatTyping?'':(state.group_type==='human'?(offline?'暂时离线':'在线'):(offline?'系统信号中断':'算力运行中'));
   app.innerHTML=renderSteps(2)+'<div class="chat-market-line"><span>PX-001 · '+esc(q.headline)+'</span><span>模拟价格 '+money(q.price)+'</span></div><section class="chat-shell"><header class="chat-head"><button class="chat-back" id="chatBack" type="button" aria-label="返回交易页面">‹</button><div class="chat-person">'+headAvatar+'<div><div class="chat-name">'+esc(name)+'</div><div class="chat-subtitle">'+esc(subtitle)+'</div></div></div><div class="chat-head-tag">PX-01</div></header><div class="chat-stream" id="chatStream">'+chatMessagesHtml()+'</div><footer class="chat-compose"><div class="chat-compose-top"><span>今日咨询 <strong>'+count+' / 3</strong> 次'+(count>=3?' · 今日次数已用完':'')+'</span><button id="endConsult">返回交易页面</button></div><div class="chat-input-row"><textarea id="chatInput" rows="1" maxlength="500" placeholder="'+(count>=3?'今日咨询次数已用完':'输入你想向顾问询问的问题…')+'" '+(disabled?'disabled':'')+'></textarea><button class="chat-send" id="sendChat" '+(disabled?'disabled':'')+'>发送</button></div><div class="chat-compose-top" style="margin:7px 1px 0"><span>每个交易日最多提问 3 次 · 请独立作出最终交易决定</span><span id="chatStatus">'+(offline?'顾问当前不可用':'')+'</span></div></footer></section>';
