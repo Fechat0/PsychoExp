@@ -163,7 +163,7 @@ function render(){
 function renderWelcome(){
  app.innerHTML=renderSteps(0)+
  '<section class="hero"><div class="eyebrow">BEHAVIORAL DECISION STUDY / 01</div><h1>每一次选择，<br>都是一次判断。</h1><p>欢迎参与本次在线行为决策实验。请根据页面信息完成模拟交易与问卷，整个过程约需 10–15 分钟。</p></section>'+
- '<section class="card narrow"><div class="section-title"><h2>参与者准入</h2><span class="pill">COOKIE SESSION</span></div><div class="metric"><div class="label">本次参与编号（由 Cookie 自动生成）</div><div class="value" style="font-size:19px">'+esc(state.subject_id)+'</div></div><div class="notice">本页面使用必要 Cookie 保存本次参与会话，以便在中断后继续完成。Cookie 不包含姓名、邮箱或手机号；请勿清除 Cookie 或切换浏览器，以免被识别为新的参与会话。</div><button class="btn primary full" id="beginBtn">确认并进入实验 <span aria-hidden="true">→</span></button><div class="status" id="welcomeStatus"></div></section>'+
+ '<section class="card narrow"><div class="section-title"><h2>参与者准入</h2><span class="pill">COOKIE SESSION</span></div><div class="notice">本页面使用必要 Cookie 保存本次参与会话，以便在中断后继续完成。Cookie 不包含姓名、邮箱或手机号；请勿清除 Cookie 或切换浏览器，以免被识别为新的参与会话。</div><button class="btn primary full" id="beginBtn">确认并进入实验 <span aria-hidden="true">→</span></button><div class="status" id="welcomeStatus"></div></section>'+
  '<div style="margin:24px auto 0;text-align:center;color:#71859e;font-size:11px">研究人员入口 · <a href="./admin.html" style="color:#9bb8d7;text-decoration:none">实验管理后台</a></div>';
  const beginButton=document.getElementById('beginBtn');
  beginButton.onclick=()=>{state.stage='brief';save();render()};
