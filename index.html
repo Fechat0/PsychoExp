@@ -178,7 +178,7 @@ function renderWelcome(){
  '<div style="margin:24px auto 0;text-align:center;color:#71859e;font-size:11px">研究人员入口 · <a href="./admin.html" style="color:#9bb8d7;text-decoration:none">实验管理后台</a></div>';
  const beginButton=document.getElementById('beginBtn');
  beginButton.onclick=()=>{state.stage='brief';save();render()};
- if(!cookieAdmissionReady){beginButton.disabled=true;document.getElementById('welcomeStatus').textContent='暂时无法完成参与会话分配，请检查网络后刷新页面。'};
+ if(!cookieAdmissionReady){beginButton.disabled=true;document.getElementById('welcomeStatus').textContent=admissionError||'正在准备参与会话，请稍候…'};
 }
 function renderBrief(){
  app.innerHTML=renderSteps(1)+'<section class="hero"><div class="eyebrow">EXPERIMENT BRIEFING / 02</div><h1>进入模拟市场</h1><p>请阅读以下规则。实验中没有真实资金交易，最终结果仅用于行为研究。</p></section><section class="card narrow"><div class="section-title"><h2>你的投资任务</h2><span class="pill">10 个交易日</span></div><div class="metrics"><div class="metric"><div class="label">初始模拟资金</div><div class="value">100,000<span class="unit">CNY</span></div></div><div class="metric"><div class="label">观察资产</div><div class="value">PX-001</div></div></div><div class="divider"></div><p>你将拥有 <strong>¥100,000</strong> 的模拟资金，在接下来的 <strong>10 个交易日</strong> 内自主决定买入、卖出或持有某只股票。你可以随时查看现金、持股数量与账户总资产。</p><p>实验过程中会提供顾问建议供你参考。你也可以随时打开聊天窗口追问，最多咨询 3 次，并随时返回交易台继续操作。最终交易决定仍由你自主作出。</p><div class="notice"><strong>实验说明</strong><br>页面中的股票行情为模拟市场信息，并非真实证券报价。所有交易均为虚拟交易，不会产生真实盈亏。请独立完成决策，不要刷新或关闭当前浏览器会话。</div><button class="btn primary full" id="startTrading">我已了解，开始第 1 个交易日 →</button></section>';
