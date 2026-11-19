@@ -82,6 +82,17 @@ function isNumberInRange(value: unknown, min: number, max: number): boolean {
   return typeof value === "number" && Number.isFinite(value) && value >= min && value <= max;
 }
 
+function countSuggestionWords(value: string): number {
+  const text = value.trim();
+  if (!text) return 0;
+  const segmenter = new Intl.Segmenter("zh-CN", { granularity: "word" });
+  let count = 0;
+  for (const part of segmenter.segment(text)) {
+    if (part.isWordLike) count++;
+  }
+  return count;
+}
+
 function validatePayload(body: unknown): string | null {
   if (!isObject(body)) return "Submission body must be a JSON object.";
   if (typeof body.subject_id !== "string" || body.subject_id.trim().length < 1 || body.subject_id.trim().length > 64) {
@@ -102,6 +113,15 @@ function validatePayload(body: unknown): string | null {
   if (groupAdvisor[body.group_code] !== body.group_type) {
     return "group_code does not match the assigned advisor type.";
   }
+  const suggestion = body.participant_suggestion ?? "";
+  if (typeof suggestion !== "string" || suggestion.length > 2000) {
+    return "participant_suggestion must be text of at most 2000 characters.";
+  }
+  if (countSuggestionWords(suggestion) > 70) {
+    return "participant_suggestion must contain no more than 70 words.";
+  }
+  body.participant_suggestion = suggestion.trim();
+
   if (!isObject(body.daily_trades) || !Array.isArray(body.daily_trades.days) || body.daily_trades.days.length > 10) {
     return "daily_trades must contain a days array with at most 10 entries.";
   }
