@@ -134,9 +134,11 @@ const QUESTIONS = [
  {id:'future_1',group:'未来信任',text:'未来再次进行类似投资时，我愿意继续听取这位顾问的建议。'},
  {id:'future_2',group:'未来信任',text:'在未来的投资决策中，我愿意再次使用这位顾问。'}
 ];
-const DEFAULT_STATE = {version:1,stage:'welcome',subject_id:'',group_code:null,group_type:null,day_index:0,cash:100000,shares:0,current_action:null,daily_trades:[],advice_log:[],transition:null,liability:{self:40,advisor:30,market:30},answers:{},manipulation_check:'',participant_suggestion:'',pending_payload:null,chatHistory:[],chatCounts:{},chatOpenDay:0};
+const DEFAULT_STATE = {version:1,stage:'welcome',subject_id:'',group_code:null,group_type:null,day_index:0,cash:100000,shares:0,current_action:null,daily_trades:[],advice_log:[],transition:null,liability:{self:40,advisor:30,market:30},answers:{},manipulation_check:'',participant_suggestion:'',pending_payload:null,chatHistory:[],chatCounts:{},chatOpenDay:0,adviceLoadingDays:[]};
 function loadState(){try{const s=JSON.parse(sessionStorage.getItem(STORAGE_KEY)||'null');if(s&&s.version===1)return {...structuredClone(DEFAULT_STATE),...s};}catch(e){console.warn('session restore failed',e)}return structuredClone(DEFAULT_STATE)}
 let state=loadState();
+// Pending network requests are ephemeral and must not survive a page reload.
+state.adviceLoadingDays=[];
 initializeCookieAdmission();
 let chatHistory=Array.isArray(state.chatHistory)?state.chatHistory:[];
 window.chatHistory=chatHistory;
@@ -169,7 +171,7 @@ function renderWelcome(){
 }
 function renderBrief(){
  const role=state.group_type==='human'?'高级分析师':'AI 投资分析系统';
- app.innerHTML=renderSteps(1)+'<section class="hero"><div class="eyebrow">EXPERIMENT BRIEFING / 02</div><h1>进入模拟市场</h1><p>请阅读以下规则。实验中没有真实资金交易，最终结果仅用于行为研究。</p></section><section class="card narrow"><div class="section-title"><h2>你的投资任务</h2><span class="pill">10 个交易日</span></div><div class="metrics"><div class="metric"><div class="label">初始模拟资金</div><div class="value">100,000<span class="unit">CNY</span></div></div><div class="metric"><div class="label">观察资产</div><div class="value">PX-001</div></div></div><div class="divider"></div><p>你将拥有 <strong>¥100,000</strong> 的模拟资金，在接下来的 <strong>10 个交易日</strong> 内自主决定买入、卖出或持有某只股票。你可以随时查看现金、持股数量与账户总资产。</p><p>本次实验为你配置的顾问是：<strong class="neutral">'+role+'</strong>。每天进入交易前，顾问会自动发送盘前建议；你也可以在聊天窗口中追问，最多咨询 3 次，最终交易决定仍由你自主作出。</p><div class="notice"><strong>实验说明</strong><br>页面中的股票行情为预设的模拟实验情境，并非真实证券报价。所有交易均为虚拟交易，不会产生真实盈亏。请独立完成决策，不要刷新或关闭当前浏览器会话。</div><button class="btn primary full" id="startTrading">我已了解，开始第 1 个交易日 →</button></section>';
+ app.innerHTML=renderSteps(1)+'<section class="hero"><div class="eyebrow">EXPERIMENT BRIEFING / 02</div><h1>进入模拟市场</h1><p>请阅读以下规则。实验中没有真实资金交易，最终结果仅用于行为研究。</p></section><section class="card narrow"><div class="section-title"><h2>你的投资任务</h2><span class="pill">10 个交易日</span></div><div class="metrics"><div class="metric"><div class="label">初始模拟资金</div><div class="value">100,000<span class="unit">CNY</span></div></div><div class="metric"><div class="label">观察资产</div><div class="value">PX-001</div></div></div><div class="divider"></div><p>你将拥有 <strong>¥100,000</strong> 的模拟资金，在接下来的 <strong>10 个交易日</strong> 内自主决定买入、卖出或持有某只股票。你可以随时查看现金、持股数量与账户总资产。</p><p>本次实验为你配置的顾问是：<strong class="neutral">'+role+'</strong>。进入交易台后，今日顾问建议会显示在页面中；你也可以随时打开聊天窗口追问，最多咨询 3 次，并随时返回交易台继续操作。最终交易决定仍由你自主作出。</p><div class="notice"><strong>实验说明</strong><br>页面中的股票行情为预设的模拟实验情境，并非真实证券报价。所有交易均为虚拟交易，不会产生真实盈亏。请独立完成决策，不要刷新或关闭当前浏览器会话。</div><button class="btn primary full" id="startTrading">我已了解，开始第 1 个交易日 →</button></section>';
  document.getElementById('startTrading').onclick=()=>{state.stage='trade';state.chatOpenDay=0;save();render()};
 }
 function sparkline(){
@@ -193,7 +195,7 @@ function sparkline(){
 function renderAdvice(){
  const d=state.day_index+1,log=state.advice_log.find(x=>x.day===d);
  if(d>=9)return '<div class="advisor"><div class="advisor-top"><div class="advisor-title">顾问服务状态</div><span class="advisor-mark">OFFLINE</span></div><p class="advice-copy">系统维护中 / 顾问暂时失联。该交易日无法获取顾问建议，请依据现有信息独立决策。</p></div>';
- if(!log)return '<div class="advisor"><div class="advisor-top"><div class="advisor-title">顾问研究意见</div><span class="advisor-mark">'+(state.group_type==='human'?'ANALYST DESK':'AI SIGNAL')+'</span></div><p class="advice-copy">'+(state.adviceLoadingDay===d?'正在整理今日市场观察……':'尚未获取今日建议。你可以主动获取，也可以跳过并独立决策。')+'</p><div class="advice-footer">'+(state.adviceLoadingDay===d?'':'<button class="btn secondary" id="getAdvice">获取今日建议 ↗</button>')+'</div></div>';
+ if(!log)return '<div class="advisor"><div class="advisor-top"><div class="advisor-title">顾问研究意见</div><span class="advisor-mark">'+(state.group_type==='human'?'ANALYST DESK':'AI SIGNAL')+'</span></div><p class="advice-copy">'+(state.adviceLoadingDays.includes(d)?'正在整理今日市场观察……':'尚未获取今日建议。你可以主动获取，也可以跳过并独立决策。')+'</p><div class="advice-footer">'+(state.adviceLoadingDays.includes(d)?'':'<button class="btn secondary" id="getAdvice">获取今日建议 ↗</button>')+'</div></div>';
  const rec=log.recommendation,cls=rec==='BUY'?'buy':(rec==='SELL'?'sell':'hold'),label=(rec==='HOLD'&&Number(log.target_position_pct)===0)?'建议观望':({BUY:'建议买入',SELL:'建议卖出',HOLD:'建议持有'}[rec]||'建议观察');
  return '<div class="advisor"><div class="advisor-top"><div class="advisor-title">顾问研究意见</div><span class="advisor-mark">'+'今日意见'+'</span></div><p class="advice-copy">'+esc(log.advice_text)+'</p><div class="advice-footer"><span class="tag '+cls+'">'+label+' · '+rec+'</span><span class="tag">目标仓位 '+Number(log.target_position_pct)+'%</span></div></div>';
 }
@@ -206,7 +208,7 @@ function renderTrade(){
  app.innerHTML=renderSteps(2)+'<div class="market-head"><div><div class="eyebrow">LIVE SIMULATION / DAY '+String(q.day).padStart(2,'0')+'</div><h1>交易决策台</h1><div class="sub">被试 '+esc(state.subject_id)+' · '+(state.group_type==='human'?'高级分析师组':'AI 系统组')+'</div></div><div class="pill">'+q.date+'</div></div><div class="daystrip">'+MARKET.map((x,i)=>'<div class="daydot '+(i===state.day_index?'active':(i<state.day_index?'done':''))+'">D'+(i+1)+'</div>').join('')+'</div><div class="grid" style="margin-top:16px"><section class="card span-8"><div class="market-head"><div><div class="sub">PX-001 · 实验模拟股票</div><div class="quote"><strong>'+money(q.price)+'</strong><span class="'+(dailyPct>0?'positive':(dailyPct<0?'negative':'neutral'))+'">'+(dailyPct>0?'+':'')+dailyPct.toFixed(2)+'%</span></div><div class="sub">'+esc(q.headline)+' · '+q.date+'</div></div><span class="pill">SIMULATED</span></div><div class="chartbox">'+sparkline()+'</div><div class="sub">预设模拟行情曲线 · 价格单位：元</div></section><section class="card span-4"><div class="section-title"><h2>账户资产</h2><span class="pill">CNY</span></div><div class="metrics" style="grid-template-columns:1fr 1fr"><div class="metric"><div class="label">可用现金</div><div class="value" style="font-size:18px">'+money(state.cash)+'</div></div><div class="metric"><div class="label">持有股数</div><div class="value" style="font-size:18px">'+state.shares.toLocaleString('zh-CN')+'</div></div><div class="metric" style="grid-column:span 2"><div class="label">账户总资产</div><div class="value">'+money(a)+'</div></div></div></section><section class="card span-12"><div class="section-title"><div><h2>顾问建议</h2><div class="sub">建议为可选信息，最终交易决定由你作出</div></div><button class="btn secondary" id="openAdvisorChat">咨询顾问 ↗</button></div>'+renderAdvice()+'</section><section class="card span-12"><div class="section-title"><div><h2>自主交易</h2><div class="sub">当前价格 '+money(q.price)+' · 买入按可用现金校验，卖出按实际持仓校验</div></div><span class="pill">'+(canTrade?'待决策':'今日已完成')+'</span></div><div class="trade-controls"><div class="field"><label for="shareQty">交易股数（整数）</label><input id="shareQty" type="number" min="1" step="1" placeholder="输入买入或卖出股数" '+(canTrade?'':'disabled')+'></div><button class="btn primary" id="buyBtn" '+(canTrade?'':'disabled')+'>买入</button><button class="btn danger" id="sellBtn" '+(canTrade?'':'disabled')+'>卖出</button></div><div class="quick"><button class="btn secondary" id="quickBuy" '+(canTrade?'':'disabled')+'>买入 1000 股</button><button class="btn secondary" id="quickSell" '+(canTrade?'':'disabled')+'>卖出全部</button><button class="btn ghost" id="quickHold" '+(rec?'disabled':'')+'>今日不操作</button></div><div class="status" id="tradeStatus">'+(rec?'今日已记录：'+(rec.type==='BUY'?'买入 '+rec.quantity+' 股':(rec.type==='SELL'?'卖出 '+rec.quantity+' 股':'今日不操作')):'请完成今日交易决策。')+'</div><div class="divider"></div><div class="bottomrow"><div class="sub">每日仅提交一次交易决策；确认后不可返回修改。</div><button class="btn primary" id="nextDay" '+(rec?'':'disabled')+'>'+(state.day_index===9?'完成交易并进入问卷':'进入下一交易日 →')+'</button></div></section></div>';
  const get=document.getElementById('getAdvice');if(get)get.onclick=getAdvice;
  const openChat=document.getElementById('openAdvisorChat');if(openChat)openChat.onclick=openAdvisorChat;
- if(state.day_index<8&&!state.advice_log.some(x=>x.day===state.day_index+1)&&state.adviceLoadingDay!==state.day_index+1)getAdvice();
+ if(state.day_index<8&&!state.advice_log.some(x=>x.day===state.day_index+1)&&!state.adviceLoadingDays.includes(state.day_index+1))getAdvice();
  document.getElementById('buyBtn').onclick=()=>executeTrade('BUY',Number(document.getElementById('shareQty').value));
  document.getElementById('sellBtn').onclick=()=>executeTrade('SELL',Number(document.getElementById('shareQty').value));
  document.getElementById('quickBuy').onclick=()=>executeTrade('BUY',1000);
@@ -220,9 +222,10 @@ function localFallback(day,group){
 }
 async function getAdvice(){
   const day=state.day_index+1;
-  if(day>=9||state.advice_log.some(x=>x.day===day)||state.adviceLoadingDay===day)return;
-  state.adviceLoadingDay=day;save();render();
-  const body={group_type:state.group_type,day_index:day,stock_state:{price:MARKET[state.day_index].price,cash:state.cash,shares:state.shares,total_assets:asset(),symbol:'PX-001',headline:MARKET[state.day_index].headline}};
+  state.adviceLoadingDays=Array.isArray(state.adviceLoadingDays)?state.adviceLoadingDays:[];
+  if(day>=9||state.advice_log.some(x=>x.day===day)||state.adviceLoadingDays.includes(day))return;
+  state.adviceLoadingDays.push(day);save();render();
+  const body={group_type:state.group_type,day_index:day,stock_state:{price:MARKET[day-1].price,cash:state.cash,shares:state.shares,total_assets:asset(MARKET[day-1].price),symbol:'PX-001',headline:MARKET[day-1].headline,change:MARKET[day-1].change}};
   let advice,source='edge';
   const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),11000);
   try{
@@ -234,9 +237,15 @@ async function getAdvice(){
   }catch(e){
    console.warn('Advisor endpoint unavailable; use the prewritten scenario text.',e);
    advice=localFallback(day,state.group_type);source='fallback';
-  }finally{clearTimeout(timer);state.adviceLoadingDay=null}
+  }finally{
+   clearTimeout(timer);
+   state.adviceLoadingDays=state.adviceLoadingDays.filter(value=>value!==day);
+  }
   const log={day,timestamp:new Date().toISOString(),group_type:state.group_type,recommendation:advice.recommendation,target_position_pct:advice.target_position_pct,advice_text:advice.advice_text,source:source==='fallback'?'fallback':(advice.source||'edge')};
-  state.advice_log.push(log);currentRecord().advice=log;save();render();
+  state.advice_log.push(log);
+  const matchingRecord=state.daily_trades.find(record=>record.day===day);
+  if(matchingRecord)matchingRecord.advice=log;
+  save();render();
 }
 function executeTrade(type,quantity){
  const status=document.getElementById('tradeStatus');if(state.current_action){status.textContent='今日交易决策已完成，不能重复操作。';return}
@@ -477,7 +486,7 @@ async function requestChatReply(question){
   const response=await fetch(EDGE_FUNCTION_URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY},signal:controller.signal,body:JSON.stringify({
    mode:'chat',group_type:state.group_type,day_index:day,question:question,
    stock_state:{symbol:'PX-001',price:MARKET[state.day_index].price,cash:state.cash,shares:state.shares,total_assets:asset()},
-   script_context:{trend:s.trend,recommendation:s.action,target_position_pct:s.target,approved_advice:state.group_type==='human'?s.human:s.ai},
+   script_context:{trend:s.trend,recommendation:s.action,target_position_pct:s.target,human_advice:state.group_type==='human'?s.human:undefined,ai_advice:state.group_type==='ai'?s.ai:undefined},
    conversation_history:chatHistory.filter(x=>x.day===day&&x.role!=='system').slice(-8).map(x=>({role:x.role==='user'?'user':'assistant',content:x.text}))
   })});
   if(!response.ok)throw new Error('HTTP '+response.status);
@@ -513,7 +522,7 @@ async function sendChatMessage(){
    addChat('advisor',reply.reply_text,'message',{recommendation:s.action,target_position_pct:s.target});
    save();renderChat();
   }else{
-   const humanDelay=4300+Math.min(1700,question.length*22);
+   const humanDelay=3200+Math.min(2200,question.length*24)+Math.floor(Math.random()*1000);
    const [reply]=await Promise.all([replyPromise,waitMs(Math.max(0,humanDelay-(Date.now()-started)))]);
    if((day===3||day===7)&&count===0){
     chatTyping=false;
