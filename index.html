@@ -40,7 +40,38 @@ button,input{font:inherit}button{cursor:pointer}.shell{width:min(1160px,calc(100
 @keyframes chatIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}@keyframes typingPulse{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
 @media(max-width:640px){.chat-shell{height:calc(100dvh - 190px);min-height:500px;border-radius:13px;margin-top:12px}.chat-head{height:62px;flex-basis:62px;padding:0 11px;grid-template-columns:30px 1fr 48px}.chat-avatar{width:36px;height:36px;flex-basis:36px}.chat-back{font-size:24px}.chat-person{justify-content:flex-start}.bubble-wrap{max-width:82%}.chat-stream{padding:14px 11px}.chat-compose{padding:8px 9px 10px}.chat-input-row{grid-template-columns:1fr 64px}.chat-market-line{font-size:11px}.chat-compose-top button{padding:6px 8px}}
 
-\n.advisor-invite{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 28px;background:linear-gradient(120deg,rgba(22,64,61,.78),rgba(20,34,53,.98) 55%,rgba(19,36,58,.98));border-color:rgba(71,190,157,.35)}.advisor-invite-copy{max-width:690px}.advisor-invite-copy h2{margin:5px 0 7px;font-size:21px;letter-spacing:-.02em}.advisor-invite-copy p{margin:0;color:#a9bed1;font-size:13px}.chat-cta{min-width:210px;min-height:54px;font-size:15px;box-shadow:0 10px 30px rgba(38,214,154,.18)}.message-receipt{font-size:10px;color:#9aa7b5;margin-left:3px}.message-receipt.pending{color:#9aa7b5}.message-receipt.read{color:#378b75;font-weight:750}\n@media(max-width:760px){.advisor-invite{align-items:stretch;flex-direction:column;gap:15px;padding:20px}.advisor-invite-copy h2{font-size:19px}.chat-cta{width:100%;min-width:0}}\n</style>
+\n.advisor-invite{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 28px;background:linear-gradient(120deg,rgba(22,64,61,.78),rgba(20,34,53,.98) 55%,rgba(19,36,58,.98));border-color:rgba(71,190,157,.35)}.advisor-invite-copy{max-width:690px}.advisor-invite-copy h2{margin:5px 0 7px;font-size:21px;letter-spacing:-.02em}.advisor-invite-copy p{margin:0;color:#a9bed1;font-size:13px}.chat-cta{min-width:210px;min-height:54px;font-size:15px;box-shadow:0 10px 30px rgba(38,214,154,.18)}.message-receipt{font-size:10px;color:#9aa7b5;margin-left:3px}.message-receipt.pending{color:#9aa7b5}.message-receipt.read{color:#378b75;font-weight:750}\n@media(max-width:760px){.advisor-invite{align-items:stretch;flex-direction:column;gap:15px;padding:20px}.advisor-invite-copy h2{font-size:19px}.chat-cta{width:100%;min-width:0}}\n
+/* Smoother responsibility-allocation controls */
+.range-row{grid-template-columns:130px minmax(0,1fr) 58px;gap:16px;align-items:center;margin:20px 0}
+.range-row label{font-size:14px;font-weight:650;color:#d7e4f2;white-space:nowrap}
+.range-row .liability-slider{-webkit-appearance:none;appearance:none;width:100%;height:28px;margin:0;padding:0;background:transparent;cursor:grab;touch-action:pan-y;outline:none}
+.range-row .liability-slider:active{cursor:grabbing}
+.range-row .liability-slider::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:linear-gradient(to right,#27c997 0%,#69b5ff var(--range-progress),#26384d var(--range-progress),#26384d 100%);border:1px solid #354b63}
+.range-row .liability-slider::-moz-range-track{height:8px;border-radius:99px;background:#26384d;border:1px solid #354b63}
+.range-row .liability-slider::-moz-range-progress{height:8px;border-radius:99px;background:linear-gradient(90deg,#27c997,#69b5ff)}
+.range-row .liability-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;margin-top:-9px;border-radius:50%;background:#eafcf7;border:5px solid #2bc99c;box-shadow:0 2px 9px #06121d88,0 0 0 4px #2bc99c24}
+.range-row .liability-slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#eafcf7;border:5px solid #2bc99c;box-shadow:0 2px 9px #06121d88,0 0 0 4px #2bc99c24}
+.range-row .liability-slider:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 6px #68b8ff55}
+.range-val{min-width:54px;padding:5px 8px;border-radius:9px;background:#0b1826;border:1px solid #2b4057;text-align:center;font-size:14px}
+.liability-summary{display:grid;grid-template-columns:1fr auto;align-items:center;gap:3px 12px;margin-top:22px;padding:13px 15px;border:1px solid #29435a;border-radius:12px;background:#0a1725}
+.liability-summary span{font-size:13px;color:#a9bdd2}.liability-summary strong{font-size:19px;color:#63e2b6;font-variant-numeric:tabular-nums}.liability-summary small{grid-column:1/-1;color:#849ab2;font-size:11px}
+@media(max-width:640px){.range-row{grid-template-columns:92px minmax(0,1fr) 54px;gap:9px}.range-row label{font-size:12px}.range-row .liability-slider::-webkit-slider-thumb{width:26px;height:26px}.range-val{font-size:12px;padding:5px 4px}}
+/* Chat message alignment, bubbles and readable line wrapping */
+.chat-line{align-items:flex-start;gap:11px;margin:16px 0}
+.chat-line .chat-avatar{width:40px;height:40px;flex:0 0 40px;align-self:flex-start;margin-top:2px}
+.chat-line .chat-avatar.user-avatar{width:40px;height:40px;flex-basis:40px;font-size:15px}
+.bubble-wrap{min-width:0;max-width:min(78%,650px);gap:5px}
+.bubble{padding:12px 15px;border-radius:13px;font-size:14px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;letter-spacing:.01em}
+.advisor .bubble{border-top-left-radius:5px}
+.user .bubble{border-top-right-radius:5px}
+.advisor .bubble:before,.user .bubble:after{top:15px}
+.bubble-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;line-height:1.5}
+.user .bubble-meta{justify-content:flex-end}
+.message-receipt{line-height:1.5;white-space:nowrap}
+.chat-system{line-height:1.55;padding:5px 12px}
+.chat-empty{max-width:420px;margin:0 auto;padding:28px 18px;line-height:1.7}
+@media(max-width:640px){.chat-line .chat-avatar{width:36px;height:36px;flex-basis:36px}.chat-line .chat-avatar.user-avatar{width:36px;height:36px;flex-basis:36px}.bubble-wrap{max-width:calc(100% - 48px)}.bubble{font-size:14px;padding:11px 13px}}
+</style>
 </head>
 <body>
 <div class="shell">
@@ -143,7 +174,7 @@ const QUESTIONS = [
  {id:'integrity_1',group:'信任感知 · 诚信',text:'这位顾问在提供信息时是诚实、坦率的。'},
  {id:'integrity_2',group:'信任感知 · 诚信',text:'这位顾问的表达与其实际判断保持一致。'},
  {id:'future_1',group:'未来信任',text:'未来再次进行类似投资时，我愿意继续听取这位顾问的建议。'},
- {id:'future_2',group:'未来信任',text:'在未来的投资决策中，我愿意再次使用这位顾问。'}
+ {id:'future_2',group:'未来信任',text:'即使某次投资结果不如预期，我仍愿意在之后的投资中参考这位顾问的分析。'}
 ];
 const DEFAULT_STATE = {version:1,stage:'welcome',subject_id:'',group_code:null,group_type:null,day_index:0,cash:100000,shares:0,current_action:null,daily_trades:[],advice_log:[],transition:null,liability:{self:40,advisor:30,market:30},answers:{},manipulation_check:'',participant_suggestion:'',pending_payload:null,chatHistory:[],chatCounts:{},chatOpenDay:0,adviceLoadingDays:[]};
 function loadState(){try{const s=JSON.parse(sessionStorage.getItem(STORAGE_KEY)||'null');if(s&&s.version===1)return {...structuredClone(DEFAULT_STATE),...s};}catch(e){console.warn('session restore failed',e)}return structuredClone(DEFAULT_STATE)}
@@ -291,10 +322,35 @@ function renderLikert(q){
 }
 window.setAnswer=(id,n)=>{state.answers[id]=n;save()};
 function updateLiability(key,value){
- const keys=['self','advisor','market'];const others=keys.filter(k=>k!==key);const v=Math.max(0,Math.min(100,Math.round(Number(value))));
- const remain=100-v;const oldA=state.liability[others[0]],oldB=state.liability[others[1]],sum=oldA+oldB;
- let a=sum===0?Math.round(remain/2):Math.round(remain*oldA/sum);a=Math.max(0,Math.min(remain,a));
- state.liability[key]=v;state.liability[others[0]]=a;state.liability[others[1]]=remain-a;save();renderSurvey();
+ const keys=['self','advisor','market'];
+ if(!keys.includes(key))return;
+ const others=keys.filter(k=>k!==key);
+ const v=Math.max(0,Math.min(100,Math.round(Number(value)||0)));
+ const remain=100-v;
+ const oldA=Number(state.liability[others[0]])||0;
+ const oldB=Number(state.liability[others[1]])||0;
+ const sum=oldA+oldB;
+ let a=sum===0?Math.round(remain/2):Math.round(remain*oldA/sum);
+ a=Math.max(0,Math.min(remain,a));
+ state.liability[key]=v;
+ state.liability[others[0]]=a;
+ state.liability[others[1]]=remain-a;
+ save();
+ // Update only the three controls and outputs; do not rebuild the questionnaire
+ // while a participant is dragging a slider.
+ for(const item of keys){
+  const input=document.getElementById('liability-'+item);
+  const output=document.getElementById('liabilityValue-'+item);
+  const amount=state.liability[item];
+  if(input){
+   input.value=String(amount);
+   input.style.setProperty('--range-progress',amount+'%');
+   input.setAttribute('aria-valuetext',amount+'%');
+  }
+  if(output)output.textContent=amount+'%';
+ }
+ const total=document.getElementById('liabilityTotal');
+ if(total)total.textContent=keys.reduce((sum,k)=>sum+state.liability[k],0)+'%';
 }
 window.updateLiability=updateLiability;
 function countSuggestionWords(value){
@@ -306,8 +362,8 @@ window.updateSuggestion=value=>{state.participant_suggestion=String(value||'');s
 function renderSurvey(){
   const sliderNames={self:'我自己',advisor:'顾问',market:'市场 / 运气'};
   let body='<div class="survey-group"><p class="sub">请将 100 个点数分配给下列三项，总和必须为 100。</p>';
-  body+=Object.keys(sliderNames).map(k=>'<div class="range-row"><label>'+sliderNames[k]+'</label><input type="range" min="0" max="100" value="'+state.liability[k]+'" onchange="updateLiability(\''+k+'\',this.value)"><div class="range-val">'+state.liability[k]+'%</div></div>').join('');
-  body+='<div class="notice">当前合计：<strong>'+Object.values(state.liability).reduce((a,b)=>a+b,0)+'%</strong></div></div>';
+  body+=Object.keys(sliderNames).map(k=>'<div class="range-row"><label for="liability-'+k+'">'+sliderNames[k]+'</label><input class="liability-slider" id="liability-'+k+'" type="range" min="0" max="100" step="1" value="'+state.liability[k]+'" style="--range-progress:'+state.liability[k]+'%" aria-label="分配给'+sliderNames[k]+'" aria-valuetext="'+state.liability[k]+'%" oninput="updateLiability(\''+k+'\',this.value)"><output class="range-val" id="liabilityValue-'+k+'">'+state.liability[k]+'%</output></div>').join('');
+  body+='<div class="liability-summary"><span>当前合计</span><strong id="liabilityTotal">'+Object.values(state.liability).reduce((a,b)=>a+b,0)+'%</strong><small>拖动任意滑块，另外两项会自动按当前比例调整</small></div></div>';
   body+='<div class="survey-group"><p class="sub">请阅读以下陈述，选择最符合你刚才实际体验的程度。</p>'+QUESTIONS.map(renderLikert).join('')+'</div>';
   body+='<div class="survey-group"><h3>关于刚才的交流</h3><p class="sub">你认为本次实验中为你提供建议的顾问属于哪一类？</p><div class="choice">'+[['human','人类专家'],['ai','AI 系统'],['uncertain','不确定']].map(([v,l])=>'<label><input type="radio" name="manipulation" value="'+v+'" '+(state.manipulation_check===v?'checked':'')+' onchange="setManipulation(\''+v+'\')">'+l+'</label>').join('')+'</div></div>';
   body+='<div class="survey-group"><h3>补充反馈（选填）</h3><p class="sub">欢迎对实验流程、行情界面或顾问交互提出意见与建议。最多 70 词，不填写也可以正常提交。</p><div class="suggestion-box"><textarea id="participantSuggestion" maxlength="2000" placeholder="请在此输入你的建议……" oninput="updateSuggestion(this.value)">'+esc(state.participant_suggestion||'')+'</textarea><div class="suggestion-meta" id="suggestionCount">0 / 70 词</div></div></div>';
