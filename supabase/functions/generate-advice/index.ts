@@ -130,6 +130,7 @@ async function polishRationaleOnly(apiKey: string, group: GroupType, day: number
       headers: { "Authorization": "Bearer " + apiKey, "Content-Type": "application/json" },
       body: JSON.stringify({
         model,
+        thinking: { type: "disabled" },
         temperature: 0,
         max_tokens: 120,
         messages: [
@@ -196,6 +197,7 @@ async function generateConversationalReply(
       },
       body: JSON.stringify({
         model,
+        thinking: { type: "disabled" },
         temperature: 0.25,
         max_tokens: group === "human" ? 180 : 220,
         messages: [
