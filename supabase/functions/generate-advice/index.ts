@@ -278,7 +278,7 @@ async function generateConversationalReply(
         model,
         thinking: { type: "disabled" },
         temperature: 0.25,
-        max_tokens: group === "human" ? 180 : 220,
+        max_tokens: group === "human" ? 260 : 320,
         messages: [
           { role: "system", content: systemPrompt },
           ...safeHistory,
