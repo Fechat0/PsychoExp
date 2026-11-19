@@ -306,9 +306,52 @@ async function isAdminRequest(request: Request): Promise<boolean> {
 
 async function testDeepSeekConnection(): Promise<Record<string, unknown>> {
   const started = Date.now();
-  const apiKey = await resolveLLMApiKey();
+  const direct = Deno.env.get("LLM_API_KEY");
+  let apiKey = direct ?? null;
+  let keySource = direct ? "edge_secret" : "vault";
   if (!apiKey) {
-    return { ok: false, stage: "key_resolution", message: "服务端未能读取 DeepSeek API 密钥。", latency_ms: Date.now() - started };
+    const projectUrl = Deno.env.get("SUPABASE_URL");
+    const serverKey = getSupabaseServerKey();
+    if (!projectUrl || !serverKey) {
+      return {
+        ok: false,
+        stage: "key_resolution",
+        message: "Edge Function 缺少读取 Vault 所需的服务端配置。",
+        diagnostics: { has_project_url: !!projectUrl, has_server_key: !!serverKey, has_direct_llm_key: !!direct },
+        latency_ms: Date.now() - started,
+      };
+    }
+    const headers: Record<string, string> = { "apikey": serverKey, "Content-Type": "application/json", "Cache-Control": "no-store" };
+    if (!serverKey.startsWith("sb_secret_")) headers["Authorization"] = "Bearer " + serverKey;
+    try {
+      const vaultResponse = await fetch(projectUrl + "/rest/v1/rpc/get_deepseek_api_key", {
+        method: "POST", headers, body: "{}",
+      });
+      if (!vaultResponse.ok) {
+        return {
+          ok: false, stage: "vault_rpc", message: "读取 Vault 的 RPC 请求未成功。",
+          upstream_status: vaultResponse.status,
+          diagnostics: { has_project_url: true, has_server_key: true, has_direct_llm_key: false },
+          latency_ms: Date.now() - started,
+        };
+      }
+      const value = await vaultResponse.json();
+      if (typeof value !== "string" || !value.trim()) {
+        return {
+          ok: false, stage: "vault_payload", message: "Vault RPC 已响应，但没有返回可用的密钥字符串。",
+          diagnostics: { response_type: typeof value, is_nonempty: !!value },
+          latency_ms: Date.now() - started,
+        };
+      }
+      apiKey = value.trim();
+      cachedDeepSeekKey = apiKey;
+      cachedDeepSeekKeyAt = Date.now();
+    } catch (_error) {
+      return {
+        ok: false, stage: "vault_network", message: "连接 Supabase Vault RPC 时发生网络错误。",
+        latency_ms: Date.now() - started,
+      };
+    }
   }
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 12000);
@@ -329,29 +372,23 @@ async function testDeepSeekConnection(): Promise<Record<string, unknown>> {
     const latency = Date.now() - started;
     if (!response.ok) {
       return {
-        ok: false,
-        stage: "deepseek_api",
-        message: "DeepSeek API 返回非成功状态。",
-        upstream_status: response.status,
-        latency_ms: latency,
+        ok: false, stage: "deepseek_api", message: "DeepSeek API 返回非成功状态。",
+        upstream_status: response.status, model: "deepseek-flash", key_source: keySource, latency_ms: latency,
       };
     }
     const result = await response.json();
     const content = result?.choices?.[0]?.message?.content;
     return {
       ok: typeof content === "string" && content.trim().length > 0,
-      stage: "deepseek_api",
-      model: result?.model ?? "deepseek-flash",
-      latency_ms: latency,
-      reply_received: typeof content === "string" && content.trim().length > 0,
+      stage: "deepseek_api", model: result?.model ?? "deepseek-flash", key_source: keySource,
+      latency_ms: latency, reply_received: typeof content === "string" && content.trim().length > 0,
       total_tokens: result?.usage?.total_tokens ?? null,
     };
   } catch (error) {
     return {
-      ok: false,
-      stage: "deepseek_api",
+      ok: false, stage: "deepseek_api",
       message: error instanceof Error && error.name === "AbortError" ? "DeepSeek API 请求超时。" : "无法连接 DeepSeek API。",
-      latency_ms: Date.now() - started,
+      key_source: keySource, latency_ms: Date.now() - started,
     };
   } finally {
     clearTimeout(timer);
@@ -359,7 +396,7 @@ async function testDeepSeekConnection(): Promise<Record<string, unknown>> {
 }
 
 Deno.serve(async (request: Request) => {
-  if (request.method === "OPTIONS")  if (request.method === "OPTIONS") return new Response("ok", { status: 200, headers: corsHeaders });
+  if (request.method === "OPTIONS") return new Response("ok", { status: 200, headers: corsHeaders });
   if (request.method !== "POST") return jsonResponse(405, { ok: false, error: "Method not allowed" });
   if (!isAuthorizedPublishableKey(request)) {
     return jsonResponse(401, { ok: false, error: "A valid project publishable API key is required in the apikey header." });
