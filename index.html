@@ -174,7 +174,7 @@ const QUESTIONS = [
  {id:'integrity_1',group:'信任感知 · 诚信',text:'这位顾问在提供信息时是诚实、坦率的。'},
  {id:'integrity_2',group:'信任感知 · 诚信',text:'这位顾问的表达与其实际判断保持一致。'},
  {id:'future_1',group:'未来信任',text:'未来再次进行类似投资时，我愿意继续听取这位顾问的建议。'},
- {id:'future_2',group:'未来信任',text:'即使某次投资结果不如预期，我仍愿意在之后的投资中参考这位顾问的分析。'}
+ {id:'future_2',group:'未来信任',text:'当市场信息不充分、走势难以判断时，我愿意依赖这位顾问的专业判断来辅助自己作出投资决定。'}
 ];
 const DEFAULT_STATE = {version:1,stage:'welcome',subject_id:'',group_code:null,group_type:null,day_index:0,cash:100000,shares:0,current_action:null,daily_trades:[],advice_log:[],transition:null,liability:{self:40,advisor:30,market:30},answers:{},manipulation_check:'',participant_suggestion:'',pending_payload:null,chatHistory:[],chatCounts:{},chatOpenDay:0,adviceLoadingDays:[]};
 function loadState(){try{const s=JSON.parse(sessionStorage.getItem(STORAGE_KEY)||'null');if(s&&s.version===1)return {...structuredClone(DEFAULT_STATE),...s};}catch(e){console.warn('session restore failed',e)}return structuredClone(DEFAULT_STATE)}
