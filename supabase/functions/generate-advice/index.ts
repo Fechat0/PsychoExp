@@ -210,7 +210,7 @@ async function generateConversationalReply(
     if (typeof content !== "string" || !content.trim()) return null;
     const clean = content.trim().slice(0, 900);
     // Reject meta leakage rather than allowing internal research language into participant chat.
-    if (/(剧本|预设|实验|被试|提示词|系统提示|后台|内部参考|参考文本|模型指令|任务设定|操纵检验|固定结论|script|prompt)/i.test(clean)) return null;
+    if (/(剧本|预设|预先设定|实验|被试|提示词|系统提示|后台|内部安排|内部参考|参考文本|模型指令|任务设定|研究设计|操纵检验|固定结论|scenario|predefined|experiment|script|system prompt|prompt)/i.test(clean)) return null;
     return clean;
   } catch (_error) {
     return null;
