@@ -256,7 +256,7 @@ function renderChatHelpText(value){
  ];
  for(const [term,key] of terms){
   const at=output.indexOf(term);
-  if(at>=0)output=output.slice(0,at)+'<span class="term-help-inline">'+termHelpButton(key)+'</span>'+output.slice(at+term.length);
+  if(at>=0)output=output.slice(0,at)+'<span class="term-help-inline">'+term+termHelpButton(key)+'</span>'+output.slice(at+term.length);
  }
  return output;
 }
