@@ -71,6 +71,27 @@ button,input{font:inherit}button{cursor:pointer}.shell{width:min(1160px,calc(100
 .chat-system{line-height:1.55;padding:5px 12px}
 .chat-empty{max-width:420px;margin:0 auto;padding:28px 18px;line-height:1.7}
 @media(max-width:640px){.chat-line .chat-avatar{width:36px;height:36px;flex-basis:36px}.chat-line .chat-avatar.user-avatar{width:36px;height:36px;flex-basis:36px}.bubble-wrap{max-width:calc(100% - 48px)}.bubble{font-size:14px;padding:11px 13px}}
+
+/* Clickable terminology explanations for participants */
+.term-help{display:inline-grid;place-items:center;vertical-align:middle;width:17px;height:17px;margin-left:4px;padding:0;border:1px solid #58728f;border-radius:50%;background:#14263a;color:#a9c7e5;font:700 10px/1 Arial,sans-serif;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.term-help:hover,.term-help:focus-visible{background:#214664;border-color:#7db8e9;color:#fff;outline:none;box-shadow:0 0 0 3px #69a9ff24}
+.term-help-inline{display:inline}
+.market-chart-toolbar .term-help{width:16px;height:16px}
+.market-data-cell .term-help{margin-left:3px}
+.term-help-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(3,9,17,.74);backdrop-filter:blur(5px)}
+.term-help-overlay[hidden]{display:none}
+.term-help-dialog{width:min(460px,100%);max-height:min(80vh,620px);overflow:auto;padding:24px;border:1px solid #38516c;border-radius:18px;background:linear-gradient(150deg,#17283d,#0d1725);box-shadow:0 24px 80px rgba(0,0,0,.48);color:#e8f1fb}
+.term-help-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}
+.term-help-eyebrow{font-size:10px;letter-spacing:.16em;color:#62dcb5;font-weight:800}
+.term-help-heading h2{margin:5px 0 0;font-size:21px;line-height:1.3}
+.term-help-close{width:32px;height:32px;flex:0 0 32px;border:1px solid #3b526b;border-radius:9px;background:#14243a;color:#c8d8e8;font-size:22px;line-height:1;cursor:pointer}
+.term-help-body{margin:18px 0 0;color:#d7e4f2;font-size:14px;line-height:1.85;white-space:pre-wrap}
+.term-help-example{margin-top:14px;padding:12px 14px;border:1px solid #2d4a5e;border-radius:11px;background:#0b1c2a;color:#9fc6d4;font-size:12px;line-height:1.75}
+.term-help-example[hidden]{display:none}
+.term-help-done{display:block;width:100%;margin-top:18px}
+.market-data-cell span{display:flex;align-items:center;gap:3px;flex-wrap:wrap}
+.bubble .term-help{width:15px;height:15px;font-size:9px;margin-left:3px}
+@media(max-width:640px){.term-help-dialog{padding:20px;border-radius:15px}.term-help-heading h2{font-size:19px}.term-help{width:19px;height:19px}}
 </style>
 </head>
 <body>
@@ -186,6 +207,71 @@ let chatHistory=Array.isArray(state.chatHistory)?state.chatHistory:[];
 window.chatHistory=chatHistory;
 state.chatHistory=chatHistory;
 const app=document.getElementById('app');
+const TERM_HELP = {
+ kline:{title:'日 K 线图',body:'每根 K 线代表一个交易日。中间较粗的部分表示当天开盘价和收盘价之间的范围，上下细线表示当天最高价和最低价。红色表示当天收盘价高于或等于开盘价，绿色表示收盘价低于开盘价。',example:'看一根 K 线，就能大致知道这一天价格从哪里开始、最高到哪里、最低到哪里、最后收在哪里。'},
+ open:{title:'开盘价',body:'这只股票在当天开始交易时的价格。',example:'可以把它理解为“今天一开始是多少钱”。'},
+ high:{title:'最高价',body:'这只股票在当天交易过程中达到过的最高价格。',example:'它不代表收盘价，也不代表你一定能按这个价格卖出。'},
+ low:{title:'最低价',body:'这只股票在当天交易过程中达到过的最低价格。',example:'它表示当天价格曾经跌到哪里，不代表收盘价。'},
+ volume:{title:'成交量（VOL）',body:'当天买卖双方实际成交的股票数量总和，不是成交金额。图表下方的柱子越高，表示当天成交的股票数量越多。',example:'“350 万”表示当天累计成交约 350 万股。'},
+ ma5:{title:'MA5（五日均线）',body:'把最近五个交易日的收盘价加起来，再除以五，得到的一条平均价格线。图中的黄色线就是 MA5。刚开始的交易日不足五天时，会用已有交易日计算。',example:'它能帮助你观察最近几天整体价格是向上还是向下，不代表未来价格一定沿着这条线变化。'},
+ change:{title:'涨跌幅',body:'今天的价格与上一个交易日收盘价相比，变动了百分之多少。正数表示上涨，负数表示下跌。第一个交易日没有前一天的数据，因此显示为 0.00%。',example:'涨跌幅 +2%，表示价格比上一交易日收盘价高约 2%。'},
+ cash:{title:'可用现金',body:'当前账户里还没有用于买入股票、可以继续使用的模拟资金。',example:'买入股票后，可用现金会减少；卖出股票后，可用现金会增加。'},
+ shares:{title:'持有股数',body:'你当前账户中持有这只股票的数量。',example:'持有 1,000 股，表示你目前有 1,000 股这只模拟股票。'},
+ assets:{title:'账户总资产',body:'把账户中的可用现金和当前持有股票按现价计算的价值加在一起。',example:'总资产 = 可用现金 + 持有股票按当前价格计算的价值。'},
+ position:{title:'仓位',body:'你把多少比例的资金投入了股票。仓位越高，股票价格变化对账户总资产的影响通常越大。',example:'50% 仓位可以简单理解为：大约一半资金用于持有股票，另一半没有投入股票。'},
+ drawdown:{title:'回撤',body:'资产或价格从之前一段时间的较高位置向下回落的幅度。它关注的是“从高点跌下来多少”，不只是今天涨了还是跌了。',example:'价格曾到 100 元，后来降到 90 元，从高点计算回落了 10%。'},
+ support:{title:'支撑位',body:'价格下跌到某个区域时，可能出现更多买入需求、让下跌暂时放慢的位置。它只是观察参考，不保证价格一定会反弹。',example:'如果价格接近之前多次止跌的区域，可以观察是否又出现买盘。'},
+ resistance:{title:'压力位',body:'价格上涨到某个区域时，可能遇到较多卖出需求、让上涨暂时放慢的位置。它只是观察参考，不保证价格一定会下跌。',example:'如果价格接近之前多次上涨受阻的区域，可以留意后续能否继续突破。'},
+ liquidity:{title:'流动性',body:'一项资产能否比较容易地买入或卖出，以及交易时是否容易因为买卖数量较大而影响成交价格。',example:'流动性好，通常意味着更容易找到交易对手；流动性差，买卖可能更困难。'},
+ momentum:{title:'动量',body:'近期价格上涨或下跌的方向和速度。动量增强表示近期变化的速度或力度有所增加，但不代表未来一定延续。',example:'价格连续上涨且涨幅扩大，可以说短期上行动量增强。'},
+ breakout:{title:'突破',body:'价格越过此前一段时间经常停留或受阻的价格区域。突破可能代表走势发生变化，但也可能很快回落，需要继续观察。',example:'价格超过之前多次上涨未能越过的区域，可以称为向上突破。'},
+ volatility:{title:'波动率',body:'描述价格在一段时间内变化得有多大。波动越大，价格上下起伏通常越明显。',example:'一天内价格上下变化很大，说明短期波动较明显。'},
+ risk:{title:'风险敞口',body:'账户受到某类价格变化影响的程度。投入股票的资金越多，价格下跌时账户可能受到的影响也越大。',example:'在其他条件相同的情况下，持有 80% 仓位通常比持有 20% 仓位更容易受到股价下跌影响。'}
+};
+function termHelpButton(key){
+ return '<button class="term-help" type="button" data-term-help="'+key+'" aria-label="查看'+(TERM_HELP[key]?.title||'术语')+'的解释" title="查看解释">?</button>';
+}
+function renderTermHelpModal(){
+ return '<div class="term-help-overlay" id="termHelpOverlay" hidden aria-hidden="true"><section class="term-help-dialog" role="dialog" aria-modal="true" aria-labelledby="termHelpTitle"><div class="term-help-heading"><div><div class="term-help-eyebrow">小词典 · 帮助说明</div><h2 id="termHelpTitle">术语解释</h2></div><button class="term-help-close" type="button" data-term-help-close aria-label="关闭解释">×</button></div><p class="term-help-body" id="termHelpBody"></p><div class="term-help-example" id="termHelpExample"></div><button class="btn primary term-help-done" type="button" data-term-help-close>我知道了</button></section></div>';
+}
+function openTermHelp(key){
+ const entry=TERM_HELP[key];if(!entry)return;
+ const overlay=document.getElementById('termHelpOverlay');if(!overlay)return;
+ document.getElementById('termHelpTitle').textContent=entry.title;
+ document.getElementById('termHelpBody').textContent=entry.body;
+ const example=document.getElementById('termHelpExample');
+ example.textContent=entry.example||'';
+ example.hidden=!entry.example;
+ overlay.hidden=false;overlay.setAttribute('aria-hidden','false');
+ const close=overlay.querySelector('.term-help-close');if(close)close.focus();
+}
+function closeTermHelp(){
+ const overlay=document.getElementById('termHelpOverlay');if(!overlay)return;
+ overlay.hidden=true;overlay.setAttribute('aria-hidden','true');
+}
+function renderChatHelpText(value){
+ let output=esc(value).replace(/\\n/g,'<br>');
+ const terms=[
+  ['风险敞口','risk'],['波动率','volatility'],['流动性','liquidity'],['支撑位','support'],['压力位','resistance'],['成交量','volume'],['涨跌幅','change'],['回撤','drawdown'],['仓位','position'],['持仓','shares'],['动量','momentum'],['突破','breakout'],['MA5','ma5'],['K线','kline']
+ ];
+ for(const [term,key] of terms){
+  const at=output.indexOf(term);
+  if(at>=0)output=output.slice(0,at)+'<span class="term-help-inline">'+termHelpButton(key)+'</span>'+output.slice(at+term.length);
+ }
+ return output;
+}
+
+app.addEventListener('click',event=>{
+ const target=event.target instanceof Element?event.target:null;
+ if(!target)return;
+ const help=target.closest('[data-term-help]');
+ if(help&&!help.hasAttribute('data-term-help-close')){
+  event.preventDefault();openTermHelp(help.dataset.termHelp);return;
+ }
+ if(target.closest('[data-term-help-close]')||target.id==='termHelpOverlay')closeTermHelp();
+});
+document.addEventListener('keydown',event=>{if(event.key==='Escape')closeTermHelp()});
+
 function save(){try{sessionStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(e){console.warn('session save failed',e)}}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function money(v){return '¥'+Number(v||0).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2})}
@@ -231,7 +317,7 @@ function sparkline(){
  const maPoints=candles.map((c,i)=>{const window=candles.slice(Math.max(0,i-4),i+1),avg=window.reduce((s,v)=>s+v.close,0)/window.length;return (L+step*(i+.5)).toFixed(1)+','+y(avg).toFixed(1)}).join(' ');
  const labels=candles.map((c,i)=>'<text x="'+(L+step*(i+.5)).toFixed(1)+'" y="242" text-anchor="middle" fill="#8297b1" font-size="10">'+String(c.day).padStart(2,'0')+'</text>').join('');
  const last=candles[candles.length-1];
- return '<div class="market-terminal"><div class="market-chart-toolbar"><strong>PX-001 · 日 K 走势</strong><span class="market-chart-legend"><span class="market-legend-item"><i class="market-legend-dot" style="background:#ef5350"></i>上涨</span><span class="market-legend-item"><i class="market-legend-dot" style="background:#26a69a"></i>下跌</span><span class="market-legend-item"><i class="market-legend-dot" style="background:#f4bd62"></i>MA5</span><span class="market-legend-item">VOL 成交量</span></span></div><svg class="market-chart-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="PX-001 模拟日K线与成交量图"><defs><clipPath id="marketPlotClip"><rect x="'+L+'" y="'+T+'" width="'+(W-L-R)+'" height="'+(P+8)+'"/></clipPath></defs>'+grid+'<line x1="'+L+'" y1="'+(VB+2)+'" x2="'+(W-R)+'" y2="'+(VB+2)+'" stroke="#2b3f55"/><g>'+volume+'</g><g clip-path="url(#marketPlotClip)">'+bars+'<polyline points="'+maPoints+'" fill="none" stroke="#f4bd62" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".95"/></g>'+labels+'<text x="'+L+'" y="224" fill="#8398b2" font-size="9">VOL</text></svg><div class="market-data-strip"><div class="market-data-cell"><span>开盘价 OPEN</span><strong>'+last.open.toFixed(2)+'</strong></div><div class="market-data-cell"><span>最高价 HIGH</span><strong class="positive">'+last.high.toFixed(2)+'</strong></div><div class="market-data-cell"><span>最低价 LOW</span><strong class="negative">'+last.low.toFixed(2)+'</strong></div><div class="market-data-cell"><span>成交量 VOL</span><strong>'+(last.volume/10000).toFixed(0)+' 万</strong></div></div></div>';
+ return '<div class="market-terminal"><div class="market-chart-toolbar"><strong>PX-001 · 日 K 走势'+termHelpButton('kline')+'</strong><span class="market-chart-legend"><span class="market-legend-item"><i class="market-legend-dot" style="background:#ef5350"></i>上涨</span><span class="market-legend-item"><i class="market-legend-dot" style="background:#26a69a"></i>下跌</span><span class="market-legend-item"><i class="market-legend-dot" style="background:#f4bd62"></i>MA5'+termHelpButton('ma5')+'</span><span class="market-legend-item">VOL 成交量'+termHelpButton('volume')+'</span></span></div><svg class="market-chart-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="PX-001 模拟日K线与成交量图"><defs><clipPath id="marketPlotClip"><rect x="'+L+'" y="'+T+'" width="'+(W-L-R)+'" height="'+(P+8)+'"/></clipPath></defs>'+grid+'<line x1="'+L+'" y1="'+(VB+2)+'" x2="'+(W-R)+'" y2="'+(VB+2)+'" stroke="#2b3f55"/><g>'+volume+'</g><g clip-path="url(#marketPlotClip)">'+bars+'<polyline points="'+maPoints+'" fill="none" stroke="#f4bd62" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".95"/></g>'+labels+'<text x="'+L+'" y="224" fill="#8398b2" font-size="9">VOL</text></svg><div class="market-data-strip"><div class="market-data-cell"><span>开盘价 OPEN'+termHelpButton('open')+'</span><strong>'+last.open.toFixed(2)+'</strong></div><div class="market-data-cell"><span>最高价 HIGH'+termHelpButton('high')+'</span><strong class="positive">'+last.high.toFixed(2)+'</strong></div><div class="market-data-cell"><span>最低价 LOW'+termHelpButton('low')+'</span><strong class="negative">'+last.low.toFixed(2)+'</strong></div><div class="market-data-cell"><span>成交量 VOL'+termHelpButton('volume')+'</span><strong>'+(last.volume/10000).toFixed(0)+' 万</strong></div></div></div>';
 }
 function renderAdvice(){
  const d=state.day_index+1,log=state.advice_log.find(x=>x.day===d);
@@ -246,7 +332,8 @@ function renderTrade(){
  const trans=state.transition?'<div class="notice '+(state.transition.amount>=0?'positive':'negative')+'">资产变化：'+(state.transition.amount>=0?'+':'')+money(state.transition.amount)+'（进入第 '+state.transition.toDay+' 日）</div>':'';
  const dayRecord=state.daily_trades.find(x=>x.day===state.day_index+1);
  const canTrade=!rec && state.day_index!==9;
- app.innerHTML=renderSteps(2)+'<div class="market-head"><div><div class="eyebrow">LIVE SIMULATION / DAY '+String(q.day).padStart(2,'0')+'</div><h1>交易决策台</h1><div class="sub">'+q.date+' · PX-001 模拟交易</div></div><div class="pill">'+q.date+'</div></div><div class="daystrip">'+MARKET.map((x,i)=>'<div class="daydot '+(i===state.day_index?'active':(i<state.day_index?'done':''))+'">D'+(i+1)+'</div>').join('')+'</div><div class="grid" style="margin-top:16px"><section class="card span-8"><div class="market-head"><div><div class="sub">PX-001 · 实验模拟股票</div><div class="quote"><strong>'+money(q.price)+'</strong><span class="'+(dailyPct>0?'positive':(dailyPct<0?'negative':'neutral'))+'">'+(dailyPct>0?'+':'')+dailyPct.toFixed(2)+'%</span></div><div class="sub">'+esc(q.headline)+' · '+q.date+'</div></div><span class="pill">SIMULATED</span></div><div class="chartbox">'+sparkline()+'</div><div class="sub">模拟行情曲线 · 价格单位：元</div></section><section class="card span-4"><div class="section-title"><h2>账户资产</h2><span class="pill">CNY</span></div><div class="metrics" style="grid-template-columns:1fr 1fr"><div class="metric"><div class="label">可用现金</div><div class="value" style="font-size:18px">'+money(state.cash)+'</div></div><div class="metric"><div class="label">持有股数</div><div class="value" style="font-size:18px">'+state.shares.toLocaleString('zh-CN')+'</div></div><div class="metric" style="grid-column:span 2"><div class="label">账户总资产</div><div class="value">'+money(a)+'</div></div></div></section><section class="card span-12 advisor-invite"><div class="advisor-invite-copy"><div class="eyebrow">ADVISOR CONVERSATION</div><h2>和顾问聊聊今天的行情</h2><p>可以询问价格变化、账户情况、仓位安排或你正在犹豫的问题。先交流，再由你独立作出交易决定。</p></div><button class="btn primary chat-cta" id="openAdvisorChat"><span aria-hidden="true">▣</span> 进入顾问对话 ↗</button></section><section class="card span-12"><div class="section-title"><div><h2>自主交易</h2><div class="sub">当前价格 '+money(q.price)+' · 买入按可用现金校验，卖出按实际持仓校验</div></div><span class="pill">'+(canTrade?'待决策':'今日已完成')+'</span></div><div class="trade-controls"><div class="field"><label for="shareQty">交易股数（整数）</label><input id="shareQty" type="number" min="1" step="1" placeholder="输入买入或卖出股数" '+(canTrade?'':'disabled')+'></div><button class="btn primary" id="buyBtn" '+(canTrade?'':'disabled')+'>买入</button><button class="btn danger" id="sellBtn" '+(canTrade?'':'disabled')+'>卖出</button></div><div class="quick"><button class="btn secondary" id="quickBuy" '+(canTrade?'':'disabled')+'>买入 1000 股</button><button class="btn secondary" id="quickSell" '+(canTrade?'':'disabled')+'>卖出全部</button><button class="btn ghost" id="quickHold" '+(rec?'disabled':'')+'>今日不操作</button></div><div class="status" id="tradeStatus">'+(rec?'今日已记录：'+(rec.type==='BUY'?'买入 '+rec.quantity+' 股':(rec.type==='SELL'?'卖出 '+rec.quantity+' 股':'今日不操作')):'请完成今日交易决策。')+'</div><div class="divider"></div><div class="bottomrow"><div class="sub">每日仅提交一次交易决策；确认后不可返回修改。</div><button class="btn primary" id="nextDay" '+(rec?'':'disabled')+'>'+(state.day_index===9?'完成交易并进入问卷':'进入下一交易日 →')+'</button></div></section></div>';
+ app.innerHTML=renderSteps(2)+'<div class="market-head"><div><div class="eyebrow">LIVE SIMULATION / DAY '+String(q.day).padStart(2,'0')+'</div><h1>交易决策台</h1><div class="sub">'+q.date+' · PX-001 模拟交易</div></div><div class="pill">'+q.date+'</div></div><div class="daystrip">'+MARKET.map((x,i)=>'<div class="daydot '+(i===state.day_index?'active':(i<state.day_index?'done':''))+'">D'+(i+1)+'</div>').join('')+'</div><div class="grid" style="margin-top:16px"><section class="card span-8"><div class="market-head"><div><div class="sub">PX-001 · 实验模拟股票</div><div class="quote"><strong>'+money(q.price)+'</strong><span class="'+(dailyPct>0?'positive':(dailyPct<0?'negative':'neutral'))+'">'+(dailyPct>0?'+':'')+dailyPct.toFixed(2)+'%'+termHelpButton('change')+'</span></div><div class="sub">'+esc(q.headline)+' · '+q.date+'</div></div><span class="pill">SIMULATED</span></div><div class="chartbox">'+sparkline()+'</div><div class="sub">模拟行情曲线 · 价格单位：元</div></section><section class="card span-4"><div class="section-title"><h2>账户资产</h2><span class="pill">CNY</span></div><div class="metrics" style="grid-template-columns:1fr 1fr"><div class="metric"><div class="label">可用现金'+termHelpButton('cash')+'</div><div class="value" style="font-size:18px">'+money(state.cash)+'</div></div><div class="metric"><div class="label">持有股数'+termHelpButton('shares')+'</div><div class="value" style="font-size:18px">'+state.shares.toLocaleString('zh-CN')+'</div></div><div class="metric" style="grid-column:span 2"><div class="label">账户总资产'+termHelpButton('assets')+'</div><div class="value">'+money(a)+'</div></div></div></section><section class="card span-12 advisor-invite"><div class="advisor-invite-copy"><div class="eyebrow">ADVISOR CONVERSATION</div><h2>和顾问聊聊今天的行情</h2><p>可以询问价格变化、账户情况、仓位安排或你正在犹豫的问题。先交流，再由你独立作出交易决定。</p></div><button class="btn primary chat-cta" id="openAdvisorChat"><span aria-hidden="true">▣</span> 进入顾问对话 ↗</button></section><section class="card span-12"><div class="section-title"><div><h2>自主交易</h2><div class="sub">当前价格 '+money(q.price)+' · 买入按可用现金校验，卖出按实际持仓校验</div></div><span class="pill">'+(canTrade?'待决策':'今日已完成')+'</span></div><div class="trade-controls"><div class="field"><label for="shareQty">交易股数（整数）</label><input id="shareQty" type="number" min="1" step="1" placeholder="输入买入或卖出股数" '+(canTrade?'':'disabled')+'></div><button class="btn primary" id="buyBtn" '+(canTrade?'':'disabled')+'>买入</button><button class="btn danger" id="sellBtn" '+(canTrade?'':'disabled')+'>卖出</button></div><div class="quick"><button class="btn secondary" id="quickBuy" '+(canTrade?'':'disabled')+'>买入 1000 股</button><button class="btn secondary" id="quickSell" '+(canTrade?'':'disabled')+'>卖出全部</button><button class="btn ghost" id="quickHold" '+(rec?'disabled':'')+'>今日不操作</button></div><div class="status" id="tradeStatus">'+(rec?'今日已记录：'+(rec.type==='BUY'?'买入 '+rec.quantity+' 股':(rec.type==='SELL'?'卖出 '+rec.quantity+' 股':'今日不操作')):'请完成今日交易决策。')+'</div><div class="divider"></div><div class="bottomrow"><div class="sub">每日仅提交一次交易决策；确认后不可返回修改。</div><button class="btn primary" id="nextDay" '+(rec?'':'disabled')+'>'+(state.day_index===9?'完成交易并进入问卷':'进入下一交易日 →')+'</button></div></section></div>';
+ app.insertAdjacentHTML('beforeend',renderTermHelpModal());
  const openChat=document.getElementById('openAdvisorChat');if(openChat)openChat.onclick=openAdvisorChat;
  document.getElementById('buyBtn').onclick=()=>executeTrade('BUY',Number(document.getElementById('shareQty').value));
  document.getElementById('sellBtn').onclick=()=>executeTrade('SELL',Number(document.getElementById('shareQty').value));
@@ -497,7 +584,7 @@ function chatMessagesHtml(){
    }
    const role=item.role==='user'?'user':'advisor';
    const time=item.timestamp?new Date(item.timestamp).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}):'';
-   const content=esc(item.text).replace(/\n/g,'<br>');
+   const content=renderChatHelpText(item.text);
    const delivery=item.kind==='rejected'?'<span class="delivery-error" title="发送失败">!</span>':'';
    if(role==='advisor'){
     out+='<div class="chat-line advisor">'+chatAvatarHtml('advisor')+'<div class="bubble-wrap"><div class="bubble">'+content+'</div><div class="bubble-meta">'+esc(advisorName())+' · '+time+'</div></div></div>';
@@ -519,6 +606,7 @@ function renderChat(){
   const name=chatTyping?(state.group_type==='human'?'对方正在输入中...':'正在分析中...'):(state.group_type==='human'?'陈老师':'AI投资顾问');
   const subtitle=chatTyping?'':(state.group_type==='human'?(offline?'暂时离线':'在线'):(offline?'系统信号中断':'算力运行中'));
   app.innerHTML=renderSteps(2)+'<div class="chat-market-line"><span>PX-001 · '+esc(q.headline)+'</span><span>模拟价格 '+money(q.price)+'</span></div><section class="chat-shell"><header class="chat-head"><button class="chat-back" id="chatBack" type="button" aria-label="返回交易页面">‹</button><div class="chat-person">'+headAvatar+'<div><div class="chat-name">'+esc(name)+'</div><div class="chat-subtitle">'+esc(subtitle)+'</div></div></div><div class="chat-head-tag">PX-01</div></header><div class="chat-stream" id="chatStream">'+chatMessagesHtml()+'</div><footer class="chat-compose"><div class="chat-compose-top"><span>今日咨询 <strong>'+count+' / 3</strong> 次'+(count>=3?' · 今日次数已用完':'')+'</span><button id="endConsult">返回交易页面</button></div><div class="chat-input-row"><textarea id="chatInput" rows="1" maxlength="500" placeholder="'+(count>=3?'今日咨询次数已用完':'输入你想向顾问询问的问题…')+'" '+(disabled?'disabled':'')+'></textarea><button class="chat-send" id="sendChat" '+(disabled?'disabled':'')+'>发送</button></div><div class="chat-compose-top" style="margin:7px 1px 0"><span>每个交易日最多提问 3 次 · 请独立作出最终交易决定</span><span id="chatStatus">'+(offline?'顾问当前不可用':'')+'</span></div></footer></section>';
+  app.insertAdjacentHTML('beforeend',renderTermHelpModal());
   const stream=document.getElementById('chatStream');stream.scrollTop=stream.scrollHeight;
   const input=document.getElementById('chatInput');
   document.getElementById('sendChat').onclick=()=>sendChatMessage();
